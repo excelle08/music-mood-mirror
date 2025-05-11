@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 
-import requests
 import sys
 import random
 import json
 from typing import Optional
 from datetime import datetime
 
+import requests
 
 class Song:
     """
     A class representing a song with its metadata and lyrics.
     """
-    def __init__(self, title: str, artist: str, album: Optional[str] = None, play_datetime: Optional[str] = None):
+
+    def __init__(self, title: str, artist: str,
+                 album: Optional[str] = None, play_datetime: Optional[str] = None):
         self.title = title
         self.artist = artist
         self.album = album
@@ -69,7 +71,8 @@ class Song:
         }
         if self.album is not None:
             params["album_name"] = self.album
-        req = requests.get("https://lrclib.net/api/search", params=params, timeout=10)
+        req = requests.get("https://lrclib.net/api/search",
+                           params=params, timeout=10)
         search_results = json.loads(req.text)
         if len(search_results) == 0:
             return {}
@@ -106,7 +109,7 @@ class Song:
             return None
         name = subtitles[0]["name"]
         if name.endswith("Topic"):
-            name = name[:len(name)-8].strip()
+            name = name[:len(name) - 8].strip()
         else:
             return None
         # Create the Song object
@@ -149,7 +152,8 @@ def search(song: dict) -> Song:
     return s
 
 
-def sample(song_list: list[dict], num_samples: int = 20, outfile: str = "samples.json", verbose: bool = False):
+def sample(song_list: list[dict], num_samples: int = 20,
+           outfile: str = "samples.json", verbose: bool = False):
     res = []
     N = len(song_list)
     while len(res) < num_samples:
@@ -158,7 +162,7 @@ def sample(song_list: list[dict], num_samples: int = 20, outfile: str = "samples
         song = search(song_list[i])
         if song is not None and song.lyrics is not None:
             if verbose:
-                print("="*80)
+                print("=" * 80)
                 print("Title: " + song.result_title)
                 print("Artist Name: " + song.result_artist)
                 print("Album Name: " + song.result_album)
@@ -166,7 +170,7 @@ def sample(song_list: list[dict], num_samples: int = 20, outfile: str = "samples
                 print("Lyrics: ")
                 print(song.lyrics)
 
-            #lyrics["lyrics"] = lyrics["lyrics"].encode("raw_unicode_escape").decode("utf-8")
+            # lyrics["lyrics"] = lyrics["lyrics"].encode("raw_unicode_escape").decode("utf-8")
             res.append(song.to_dict())
 
     with open(outfile, "w", encoding="utf-8") as f:
@@ -187,10 +191,11 @@ def demo():
 
     lyrics = search(song)
 
-    print(f"Search criteria: {lyrics['search_title']}, {lyrics['search_artist']}")
+    print(
+        f"Search criteria: {lyrics['search_title']}, {lyrics['search_artist']}")
 
     if lyrics["found"]:
-        print("="*80)
+        print("=" * 80)
         print("Title: " + lyrics["result_title"])
         print("Artist Name: " + lyrics["result_artist"])
         print("Album Name: " + lyrics["result_album"])
