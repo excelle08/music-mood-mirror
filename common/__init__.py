@@ -3,10 +3,11 @@ import json
 import os
 from flask import Flask, Response, render_template, jsonify
 from werkzeug.exceptions import default_exceptions
+from common.errors import APIError
 from common.model import db
+from config.settings import MYSQL_DB_URI
 from routers.error_maker import error_blueprint
 from routers.home import home_blueprint
-from common.errors import APIError
 
 
 def create_app():
@@ -14,7 +15,7 @@ def create_app():
         static_folder=os.path.join(os.path.dirname(__file__), "..", 'static'),
         template_folder=os.path.join(os.path.dirname(__file__), "..", 'templates')
     )
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:password@localhost:3306/music'
+    app.config['SQLALCHEMY_DATABASE_URI'] = MYSQL_DB_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)
 

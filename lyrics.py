@@ -5,6 +5,7 @@ import random
 import json
 from typing import Optional
 from datetime import datetime
+from config.settings import LRCLIB_SITE
 
 import requests
 
@@ -71,7 +72,7 @@ class Song:
         }
         if self.album is not None:
             params["album_name"] = self.album
-        req = requests.get("https://lrclib.net/api/search",
+        req = requests.get(f"{LRCLIB_SITE}/api/search",
                            params=params, timeout=10)
         search_results = json.loads(req.text)
         if len(search_results) == 0:
