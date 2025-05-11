@@ -8,6 +8,7 @@ from common.model import db
 from config.settings import MYSQL_DB_URI
 from routers.error_maker import error_blueprint
 from routers.home import home_blueprint
+from routers.lyrics_api import lyrics_api
 
 
 def create_app():
@@ -21,6 +22,7 @@ def create_app():
 
     app.register_blueprint(error_blueprint)
     app.register_blueprint(home_blueprint)
+    app.register_blueprint(lyrics_api)
 
     register_error_handler(app)
 
@@ -64,3 +66,4 @@ def handle_http_error(error):
         }),
         status=code
     )
+

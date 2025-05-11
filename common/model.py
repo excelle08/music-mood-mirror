@@ -67,3 +67,34 @@ class Base():
     def dict(self):
         return to_dict(self, self.__class__)
 
+
+
+class Song(Model):
+    __tablename__ = 'songs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(256), nullable=False)
+    artist = db.Column(db.String(256), nullable=False)
+    album = db.Column(db.String(256))
+    play_datetime = db.Column(db.DateTime)
+    result_title = db.Column(db.String(256))
+    result_artist = db.Column(db.String(256))
+    result_album = db.Column(db.String(256))
+    duration = db.Column(db.Integer)
+    lyrics = db.Column(db.Text)
+    synced_lyrics = db.Column(db.Text)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "artist": self.artist,
+            "album": self.album,
+            "play_datetime": self.play_datetime.isoformat() if self.play_datetime else None,
+            "result_title": self.result_title,
+            "result_artist": self.result_artist,
+            "result_album": self.result_album,
+            "duration": self.duration,
+            "lyrics": self.lyrics,
+            "synced_lyrics": self.synced_lyrics
+        }
