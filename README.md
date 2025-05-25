@@ -87,13 +87,7 @@ Polish frontend: show mood pie chart or sentence summary
 Add optional journaling input or playlist suggestion
 Final testing + submission
 
-
-
 🧪 Sample Prompt for HP AI Studio
-
-
-
-
 
 textCopyEditSong Title: Someone Like You  
 Artist: Adele  
@@ -101,4 +95,58 @@ Lyrics: I heard that you're settled down...  
 
 Analyze the emotional tone of this song. List the 2-3 most dominant emotions and provide a 1-sentence summary of how this song might make a listener feel.
 
+## Try out lyrics finding tool
 
+
+
+## Setting up the Web UI
+
+### Install prerequisites
+
+```bash
+sudo apt install mariadb-server python3.11 virtualenv
+```
+
+### Create MySQL database
+
+```bash
+$ mysql -uroot -p                                           
+Enter password:                                                                
+Welcome to the MariaDB monitor.  Commands end with ; or \g.                    
+Your MariaDB connection id is 7                                                
+Server version: 10.6.21-MariaDB-0ubuntu0.22.04.2 Ubuntu 22.04
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+MariaDB [(none)]> create database music;                                       
+Query OK, 1 row affected (0.002 sec)
+
+MariaDB [(none)]> exit
+Bye
+```
+
+### Set up virtual environment and install dependencies
+
+```bash
+virtualenv -p python3.10 venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### Check settings
+
+Please open `config/settings.py` and check if the config variables are right for your
+system, especially the MySQL password.
+
+If you choose to deploy LRCLIB locally (by following this [instruction](https://github.com/tranxuanthang/lrclib)),
+you can change the value of `LRCLIB_SITE` to `http://127.0.0.1:3306`.
+
+### Start the website
+
+Run the following command to start the web server:
+
+```bash
+python app.py
+```
+
+You can now open the webpage by visiting `http://127.0.0.1:8081` in your browser.
