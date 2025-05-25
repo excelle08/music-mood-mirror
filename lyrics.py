@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-import sys
+import argparse
 import random
 import json
 from typing import Optional
@@ -8,6 +9,7 @@ from datetime import datetime
 
 import requests
 from config.settings import LRCLIB_SITE
+
 
 class Song:
     """
@@ -212,7 +214,14 @@ def iterate_all(song_list: list[dict], outfile: str = "all_history.json"):
     res = []
 
     for i, history_entry in enumerate(song_list):
-        print(f"Processing {i} / {num_songs}, successful: {num_successful}, invalid: {num_invalid}, no result: {num_no_result}", end="\r")
+        print(
+            (f"Processing {i} / {num_songs}, ",
+             f"successful: {num_successful}, ",
+             f"invalid: {num_invalid}, ",
+             f"no result: {num_no_result}"
+            ),
+            end="\r"
+        )
         song = search(history_entry)
         if song is None:
             num_invalid += 1
@@ -234,50 +243,42 @@ def iterate_all(song_list: list[dict], outfile: str = "all_history.json"):
         json.dump(res, f, indent=2, ensure_ascii=False)
 
 
-def demo():
-    """
-    A demo function to test the search functionality.
-    :return: None
-    """
-    if len(sys.argv) < 2:
-        print("Please specify a music history json file.")
-        exit(1)
-
-    with open(sys.argv[1], "r", encoding="utf-8") as f:
-        history = json.load(f)
-
-    N = len(history)
-    song = history[random.randint(0, N)]
-
-    lyrics = search(song)
-
-    print(
-        f"Search criteria: {lyrics['search_title']}, {lyrics['search_artist']}")
-
-    if lyrics["found"]:
-        print("=" * 80)
-        print("Title: " + lyrics["result_title"])
-        print("Artist Name: " + lyrics["result_artist"])
-        print("Album Name: " + lyrics["result_album"])
-        print(f"Duration: {lyrics['duration']}s")
-        print("Lyrics: ")
-        print(lyrics["lyrics"])
-
-
-def demo2():
+def demo(input_file: str = "music_history.json", outfile: str = "one_sample.json"):
     """
     A demo function to test the sample functionality.
+    :param input_file: The input file containing music history.
     :return: None
     """
-    if len(sys.argv) < 2:
-        print("Please specify a music history json file.")
-        exit(1)
-
-    with open(sys.argv[1], "r", encoding="utf-8") as f:
+    with open(input_file, "r", encoding="utf-8") as f:
         history = json.load(f)
 
-    sample(history, verbose=True)
+    sample(history, 1, outfile, verbose=True)
 
 
 if __name__ == "__main__":
-    demo2()
+    parser = argparse.ArgumentParser(description="Lyrics search and sampling tool.")
+    parser.add_argument("action", choices=["demo", "sample", "iterate_all"],
+                        help=("Action to perform: 'demo' for a single random search, ",
+                              "'sample' for sampling N songs,",
+                              "'iterate_all' for processing all songs.")
+    )
+    parser.add_argument("--input-file", "-i", type=str, default="music_history.json",
+                        help="Input file containing music history (default: music_history.json).")
+    parser.add_argument("--num-samples", "-n", type=int, default=20,
+                        help="Number of samples to take (only for 'sample' action).")
+    parser.add_argument("--outfile", "-o", type=str, default="samples.json",
+                        help="Output file for the results (default: samples.json).")
+    parser.add_argument("--verbose", "-v", action="store_true",
+                        help="If set, print the song information and lyrics to the console.")
+    args = parser.parse_args()
+
+    if args.action == "demo":
+        demo(args.input_file, args.outfile)
+    elif args.action == "sample":
+        with open(args.input_file, "r", encoding="utf-8") as f:
+            history = json.load(f)
+        sample(history, num_samples=args.num_samples, outfile=args.outfile, verbose=args.verbose)
+    elif args.action == "iterate_all":
+        with open(args.input_file, "r", encoding="utf-8") as f:
+            history = json.load(f)
+        iterate_all(history, outfile=args.outfile)
