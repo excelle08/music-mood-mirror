@@ -5,9 +5,9 @@ import random
 import json
 from typing import Optional
 from datetime import datetime
-from config.settings import LRCLIB_SITE
 
 import requests
+from config.settings import LRCLIB_SITE
 
 class Song:
     """
@@ -32,6 +32,8 @@ class Song:
         self.result_artist = None
         self.result_album = None
         self.duration = None
+        self.seconds_played = None
+        self.music_completion_rate = None
         self.synced_lyrics = None
 
     def __str__(self):
@@ -54,6 +56,8 @@ class Song:
             "result_artist": self.result_artist,
             "result_album": self.result_album,
             "duration": self.duration,
+            "seconds_played": self.seconds_played,
+            "music_completion_rate": self.music_completion_rate,
             "lyrics": self.lyrics,
             "synced_lyrics": self.synced_lyrics
         }
@@ -84,6 +88,8 @@ class Song:
         self.duration = res["duration"]
         self.lyrics = res["plainLyrics"]
         self.synced_lyrics = res["syncedLyrics"]
+        if self.seconds_played is not None:
+            self.music_completion_rate = round(100 * self.seconds_played / self.duration, 2)
         return res
 
     @classmethod
@@ -131,7 +137,11 @@ class Song:
         artist = song["master_metadata_album_artist_name"]
         album = song["master_metadata_album_album_name"]
         # Create the Song object
-        return cls(title=title, artist=artist, album=album, play_datetime=song["ts"])
+        obj = cls(title=title, artist=artist, album=album, play_datetime=song["ts"])
+        # Extract "ms_played" and calculate the completion rate
+        if "ms_played" in song:
+            obj.seconds_played = song["ms_played"] / 1000
+        return obj
 
 
 def search(song: dict) -> Song:
@@ -155,6 +165,14 @@ def search(song: dict) -> Song:
 
 def sample(song_list: list[dict], num_samples: int = 20,
            outfile: str = "samples.json", verbose: bool = False):
+    """
+    Sample a number of songs from the song list and save their lyrics to a file.
+    :param song_list: A list of dictionaries representing songs.
+    :param num_samples: The number of samples to take.
+    :param outfile: The output file to save the lyrics.
+    :param verbose: If True, print the lyrics to the console.
+    :return: The number of successful samples.
+    """
     res = []
     N = len(song_list)
     while len(res) < num_samples:
@@ -174,12 +192,53 @@ def sample(song_list: list[dict], num_samples: int = 20,
             # lyrics["lyrics"] = lyrics["lyrics"].encode("raw_unicode_escape").decode("utf-8")
             res.append(song.to_dict())
 
+    sorted_res = sorted(res, key=lambda x: x["play_datetime"])
     with open(outfile, "w", encoding="utf-8") as f:
-        json.dump(res, f, indent=2, ensure_ascii=False)
+        json.dump(sorted_res, f, indent=2, ensure_ascii=False)
     return len(res)
 
 
+def iterate_all(song_list: list[dict], outfile: str = "all_history.json"):
+    """
+    Iterate through all songs in the song list and save their lyrics to a file.
+    :param song_list: A list of dictionaries representing songs.
+    :param outfile: The output file to save the lyrics.
+    :return: None
+    """
+    num_songs = len(song_list)
+    num_successful = 0
+    num_invalid = 0
+    num_no_result = 0
+    res = []
+
+    for i, history_entry in enumerate(song_list):
+        print(f"Processing {i} / {num_songs}, successful: {num_successful}, invalid: {num_invalid}, no result: {num_no_result}", end="\r")
+        song = search(history_entry)
+        if song is None:
+            num_invalid += 1
+            continue
+        song.search_lyrics()
+        if song.lyrics is None:
+            num_no_result += 1
+            continue
+
+        res.append(song.to_dict())
+        num_successful += 1
+
+    print(f"Total songs: {num_songs}")
+    print(f"Successfully found lyrics: {num_successful} ({100 * num_successful / num_songs:.2f}%)")
+    print(f"Invalid data points: {num_invalid} ({100 * num_invalid / num_songs:.2f}%)")
+    print(f"No results: {num_no_result} ({100 * num_no_result / num_songs:.2f}%)")
+
+    with open(outfile, "w", encoding="utf-8") as f:
+        json.dump(res, f, indent=2, ensure_ascii=False)
+
+
 def demo():
+    """
+    A demo function to test the search functionality.
+    :return: None
+    """
     if len(sys.argv) < 2:
         print("Please specify a music history json file.")
         exit(1)
@@ -206,6 +265,10 @@ def demo():
 
 
 def demo2():
+    """
+    A demo function to test the sample functionality.
+    :return: None
+    """
     if len(sys.argv) < 2:
         print("Please specify a music history json file.")
         exit(1)
