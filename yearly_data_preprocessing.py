@@ -94,6 +94,8 @@ class SongEntry:
     week: int
     mood_tags: list[str] = None  # Optional field for mood tags
     positivity_score: float = None  # Optional field for positivity score
+    mood_tags_local: list[str] = None  # Optional field for mood tags
+    positivity_score_local: float = None  # Optional field for positivity score
 
     @staticmethod
     def from_dict(data: dict) -> "SongEntry":
