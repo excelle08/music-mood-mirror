@@ -21,7 +21,7 @@ def to_dict(inst, cls):
         if type(v) in convert.keys() and v is not None:
             try:
                 d[c] = convert[c.type](v)
-            except:
+            except Exception:
                 d[c] = "Error:  Failed to covert using ", str(convert[type(v)])
         elif v is None:
             d[c] = str()
@@ -45,7 +45,7 @@ def to_json(inst, cls):
         if type(v) in convert.keys() and v is not None:
             try:
                 d[c] = convert[c.type](v)
-            except:
+            except Exception:
                 d[c] = "Error:  Failed to covert using ", str(convert[type(v)])
         elif v is None:
             d[c] = str()
@@ -68,11 +68,27 @@ class Base():
         return to_dict(self, self.__class__)
 
 
-
-class Song(Model):
-    __tablename__ = 'songs'
+class User(Model):
+    __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(64), unique=True, nullable=False)
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(128), nullable=False)
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email
+        }
+
+
+class ListenHistory(Model):
+    __tablename__ = 'listen_history'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     title = db.Column(db.String(256), nullable=False)
     artist = db.Column(db.String(256), nullable=False)
     album = db.Column(db.String(256))
@@ -80,21 +96,17 @@ class Song(Model):
     result_title = db.Column(db.String(256))
     result_artist = db.Column(db.String(256))
     result_album = db.Column(db.String(256))
-    duration = db.Column(db.Integer)
     lyrics = db.Column(db.Text)
     synced_lyrics = db.Column(db.Text)
-
-    def to_dict(self):
-        return {
-            "id": self.id,
-            "title": self.title,
-            "artist": self.artist,
-            "album": self.album,
-            "play_datetime": self.play_datetime.isoformat() if self.play_datetime else None,
-            "result_title": self.result_title,
-            "result_artist": self.result_artist,
-            "result_album": self.result_album,
-            "duration": self.duration,
-            "lyrics": self.lyrics,
-            "synced_lyrics": self.synced_lyrics
-        }
+    duration = db.Column(db.Integer)
+    seconds_played = db.Column(db.Integer)
+    music_completion_rate = db.Column(db.Float)
+    reason_start = db.Column(db.String(64))
+    reason_end = db.Column(db.String(64))
+    shuffle = db.Column(db.Boolean, default=False)
+    skip = db.Column(db.Boolean, default=False)
+    week = db.Column(db.Integer)
+    first_occurrence_in_week = db.Column(db.Boolean, default=False)
+    repeats_this_week = db.Column(db.Integer)
+    repeats_next_7d = db.Column(db.Integer)
+    
