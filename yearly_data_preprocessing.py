@@ -162,7 +162,7 @@ def clean_lyrics(lyrics: str) -> str:
     Returns:
         str: Cleaned lyrics string.
     """
-    # Remove timestamps like [00:47.01]
+    # Remove timestamps like [00:47.01] lyrics does not contain timestamps, whereas synced_lyrics does
     cleaned_lyrics = re.sub(r'\[\d{2}:\d{2}\.\d{2}\]', '', lyrics)
     # Remove extra whitespace
     cleaned_lyrics = re.sub(r'\s+', ' ', cleaned_lyrics).strip()
@@ -171,7 +171,7 @@ def clean_lyrics(lyrics: str) -> str:
 
 
 
-# clean up redundant lyrics to save tokens in LLM calls
+# TODO: clean up redundant lyrics to save tokens in LLM calls
 
 
 
