@@ -4,6 +4,8 @@
 import argparse
 import random
 import json
+import sys
+import time
 from typing import Optional
 from datetime import datetime
 
@@ -17,7 +19,9 @@ class Song:
     """
 
     def __init__(self, title: str, artist: str,
-                 album: Optional[str] = None, play_datetime: Optional[str] = None):
+                 album: Optional[str] = None, play_datetime: Optional[str] = None,
+                 reason_start: Optional[str] = None, reason_end: Optional[str] = None,
+                 shuffle: Optional[bool] = None, skipped: Optional[bool] = None):
         self.title = title
         self.artist = artist
         self.album = album
@@ -37,6 +41,10 @@ class Song:
         self.seconds_played = None
         self.music_completion_rate = None
         self.synced_lyrics = None
+        self.reason_start = reason_start
+        self.reason_end = reason_end
+        self.shuffle = shuffle
+        self.skipped = skipped
 
     def __str__(self):
         return f"Title: {self.title}, Artist: {self.artist}, Album: {self.album}"
@@ -61,10 +69,14 @@ class Song:
             "seconds_played": self.seconds_played,
             "music_completion_rate": self.music_completion_rate,
             "lyrics": self.lyrics,
-            "synced_lyrics": self.synced_lyrics
+            "synced_lyrics": self.synced_lyrics,
+            "reason_start": self.reason_start,
+            "reason_end": self.reason_end,
+            "shuffle": self.shuffle,
+            "skipped": self.skipped,
         }
 
-    def search_lyrics(self) -> dict:
+    def search_lyrics(self, retry_count: int = 3) -> dict:
         """
         Search for lyrics using the lrclib API.
         :param title: The title of the song.
@@ -78,8 +90,21 @@ class Song:
         }
         if self.album is not None:
             params["album_name"] = self.album
-        req = requests.get(f"{LRCLIB_SITE}/api/search",
-                           params=params, timeout=10)
+        for i in range(retry_count):
+            try:
+                req = requests.get(f"{LRCLIB_SITE}/api/search",
+                                   params=params, timeout=10)
+                break
+            except requests.exceptions.ConnectionError as e:
+                print(("Connection error while searching for the song "
+                       f"\"{self.artist} - {self.title}\": {e}. "
+                       f"Retrying ({i + 1}/{retry_count})..."),
+                     file=sys.stderr)
+                time.sleep(i + 1)
+                if i == retry_count - 1:
+                    print("Failed to connect after multiple attempts.", file=sys.stderr)
+                    return {}
+
         search_results = json.loads(req.text)
         if len(search_results) == 0:
             return {}
@@ -90,8 +115,10 @@ class Song:
         self.duration = res["duration"]
         self.lyrics = res["plainLyrics"]
         self.synced_lyrics = res["syncedLyrics"]
-        if self.seconds_played is not None:
+        if self.seconds_played is not None and self.duration > 0:
             self.music_completion_rate = round(100 * self.seconds_played / self.duration, 2)
+        else:
+            self.music_completion_rate = 0
         return res
 
     @classmethod
@@ -139,7 +166,10 @@ class Song:
         artist = song["master_metadata_album_artist_name"]
         album = song["master_metadata_album_album_name"]
         # Create the Song object
-        obj = cls(title=title, artist=artist, album=album, play_datetime=song["ts"])
+        obj = cls(title=title, artist=artist, album=album, play_datetime=song["ts"],
+                  reason_start=song.get("reason_start"),
+                  reason_end=song.get("reason_end"), shuffle=song.get("shuffle"),
+                  skipped=song.get("skipped"))
         # Extract "ms_played" and calculate the completion rate
         if "ms_played" in song:
             obj.seconds_played = song["ms_played"] / 1000
