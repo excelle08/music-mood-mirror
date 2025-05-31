@@ -13,7 +13,7 @@ hf_hub_download(
 llm = Llama(
     model_path="./gemma-2b-it.Q4_K_M.gguf",
     # n_gpu_layers=35,# or 0 for CPU-only
-    n_gpu_layers=35,
+    n_gpu_layers=0,
     n_ctx=8192, # maximum prompt + response tokens
     # use_mlock=True,          # optional: prevent swap
     verbose=False,
@@ -34,9 +34,6 @@ max_tokens = 512 # max number of tokens to generate in the output
 lyrics = '''
 敦煌天空的沙礫\n帶著我們的記憶\n我從半路看回去\n這情關漫漫好彎曲\n\n夢想穿過了西域\n包含了多少的禪意\n愛情像一本遊記\n我會找尋它的謎語\n\n看 月牙灣下的淚光\n在絲路之上被遺忘\n是誰的心啊 孤單的留下\n他還好嗎 我多想愛他\n拿永恆的淚 凝固的一句話\n也許可能蒸發\n\n是誰的愛啊 比淚水堅強\n輕聲呼喚 就讓我融化\n每一滴雨水 演化成我翅膀\n向著我愛的人 追吧\n\n夢想穿過了西域\n包含了多少的禪意\n愛情像一本遊記\n我會找尋它的謎語\n看 月牙灣下的淚光\n在絲路之上被遺忘\n\n是誰的心啊 孤單的留下\n他還好嗎 我多想愛他\n拿永恆的淚 凝固的一句話\n也許可能蒸發\n\n是誰的愛啊 比淚水堅強\n輕聲呼喚 就讓我融化\n每一滴雨水 演化成我翅膀\n向著我愛的人 追吧\n\n是誰的心啊 孤單的留下\n他還好嗎 我多想愛他\n拿永恆的淚 凝固的一句話\n也許可能蒸發\n\n是誰的愛啊 比淚水堅強\n輕聲呼喚 就讓我融化\n每一滴雨水 演化成我翅膀\n向著我愛的人 追吧
 '''
-
-
-
 
 def get_avg_positivity_score(tags: list) -> float:
     """
@@ -86,3 +83,7 @@ def from_lyrics_to_positivity(lyrics: str) -> float:
     tags = [tag.lstrip('#') for tag in tags_str.strip().split()]
     
     return get_avg_positivity_score(tags)
+
+if __name__ == "__main__":
+    positivity_score = from_lyrics_to_positivity(lyrics)
+    print(f"Average Positivity Score: {positivity_score:.2f}")
