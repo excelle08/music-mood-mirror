@@ -95,7 +95,12 @@ if __name__ == "__main__":
     )
 
     # Load the processed song entires for 2024
-    songs_2024 = all_processed_songs_by_year[2024]
+    songs_2024 = all_processed_songs_by_year.get(2024, [])
+    if not songs_2024:
+        print("No songs found for the year 2024.")
+        exit(1)
+    # Filter songs to only those where first_occurrence_in_week is True
+    songs_2024 = [song for song in songs_2024 if getattr(song, "first_occurrence_in_week", True)]
     # Take a random sample of 20 songs from songs_2024
     sampled_songs = random.sample(songs_2024, min(20, len(songs_2024)))
 
