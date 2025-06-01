@@ -96,6 +96,8 @@ class SongEntry:
     positivity_score: float = None  # Optional field for positivity score
     mood_tags_local: list[str] = None  # Optional field for mood tags
     positivity_score_local: float = None  # Optional field for positivity score
+    positivity_score_local_wghted: float = None  # Optional field for weighted positivity score
+    repeats_this_week: int = 0  # Optional field for repeats this week
 
     @staticmethod
     def from_dict(data: dict) -> "SongEntry":
@@ -118,7 +120,8 @@ class SongEntry:
             skipped=data["skipped"],
             synced_lyrics=data["synced_lyrics"],
             title=data["title"],
-            week=data["week"]
+            week=data["week"],
+            repeats_this_week=data.get("repeats_this_week", 0)  # Default to 0 if not present
         )
     
 

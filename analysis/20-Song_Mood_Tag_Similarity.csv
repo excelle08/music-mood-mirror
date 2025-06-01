@@ -1,0 +1,21 @@
+title,artist,mood_tags,mood_tags_local,jaccard_score,exact_matches,comment
+The Drug In Me Is You,Falling In Reverse,"['Dark', 'Melancholic', 'Reflective']","['Angry', 'Dark', 'Nostalgia']",0.2,1,Major mismatch
+Sirens (feat. Sophie Powers),MOTHICA,"['Energetic', 'Dark', 'Passionate']","['Energetic', 'Hopeful', 'Dark']",0.5,2,
+Cigaro,System Of A Down,"['Energetic', 'Playful', 'Empowering']","['Angry', 'Energetic', 'Bittersweet']",0.2,1,Major mismatch
+KILL ALL PREDATORS,Banshee,"['Angry', 'Dark', 'Energetic']","['Angry', 'Dark', 'Energetic']",1.0,3,
+they’re all around us,Poppy,"['Angry', 'Dark', 'Passionate']","['Angry', 'Sad', 'Dark']",0.5,2,
+Taxi,Nova Twins,"['Angry', 'Dark', 'Energetic']","['Energetic', 'Passionate', 'Angry']",0.5,2,
+Livin' It Up,Limp Bizkit,"['Energetic', 'Playful', 'Empowering']","['Energetic', 'Passionate', 'Uplifting']",0.2,1,Major mismatch
+LOYALTY. FEAT. RIHANNA.,Kendrick Lamar,"['Energetic', 'Empowering', 'Reflective']","['Energetic', 'Passionate', 'Loyal']",0.2,1,Major mismatch
+Masquerade - From 'The Phantom Of The Opera' Motion Picture,Andrew Lloyd Webber,"['Joyful', 'Energetic', 'Playful']","['Energetic', 'Romantic', 'Hopeful']",0.2,1,Major mismatch
+I'm So Hot,Chrissy Chlapecka,"['Empowering', 'Playful', 'Energetic']","['Energetic', 'Passionate', 'Bittersweet']",0.2,1,Major mismatch
+"Sometimes,IDontUnderstand",surrenderdorothy,"['Reflective', 'Melancholic', 'Calm']","['Hopeful', 'Energetic', 'Nostalgia']",0.0,0,Major mismatch
+This Cocaine Makes Me Feel Like I'm On This Song,System Of A Down,"['Dark', 'Playful', 'Melancholic']","['Energetic', 'Hopeful', 'Angry']",0.0,0,Major mismatch
+Люди,Дайте танк (!),"['Playful', 'Bittersweet', 'Reflective']","['Energetic', 'Romantic', 'Uplifting']",0.0,0,Major mismatch
+Scene Seven: II. One Last Time,Dream Theater,"['Melancholic', 'Reflective', 'Dark']","['Melancholy', 'Energetic', 'Heartbroken']",0.0,0,Major mismatch
+Cara Mia Addio,Aperture Science Psychoacoustic Laboratories,"['romantic', 'bittersweet', 'melancholic']","['', 'Joyful']",0.0,0,Major mismatch
+BLEED,Gao the Arsonist,"['Angry', 'Melancholic', 'Dark']","['Angry', 'Dark', 'Nostalgic']",0.5,2,
+SUPERBAD,YNG Martyr,"['Energetic', 'Playful', 'Triumphant']","['Energetic', 'Passionate', 'Angry']",0.2,1,Major mismatch
+Fuck You,Lily Allen,"['Angry', 'Energetic', 'Empowering']","['Angry', 'Sad', 'Energetic']",0.5,2,
+I Just Threw Out The Love Of My Dreams,Weezer,"['Passionate', 'Longing', 'Bittersweet']","['Energetic', 'Hopeful', 'Dark']",0.0,0,Major mismatch
+Radio/Video,System Of A Down,"['Energetic', 'Playful', 'Uplifting']","['Energetic', 'Romantic', 'Uplifting']",0.5,2,
