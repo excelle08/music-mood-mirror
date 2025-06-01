@@ -89,3 +89,7 @@ def _run_enrichment(app_context, request_id, user_id):
             progress.num_processed = num_processed
             progress.num_successful = num_successful
 
+    # Remove progress record after completion
+    progress = db.session.get(RequestProgress, request_id)
+    db.session.delete(progress)
+    db.session.commit()

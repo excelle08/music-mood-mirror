@@ -1,6 +1,7 @@
 
 import json
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
+from markupsafe import Markup
 from common.model import db, ListenHistory
 from lyrics import Song
 
@@ -21,10 +22,23 @@ def upload_history():
         try:
             history_data = json.load(file)
             added = 0
+            ignored = 0
+            failed = 0
 
             for entry in history_data:
                 s = Song.from_spotify(entry)
                 if not s:
+                    failed += 1
+                    continue
+                # Skip duplicates
+                existing = ListenHistory.query.filter_by(
+                    user_id=session['user_id'],
+                    title=s.title,
+                    artist=s.artist,
+                    play_datetime=s.play_datetime
+                ).first()
+                if existing:
+                    ignored += 1
                     continue
 
                 row = ListenHistory(
@@ -43,7 +57,9 @@ def upload_history():
                 added += 1
 
             db.session.commit()
-            flash(f"{added} entries added to your listening history.")
+            end_message = (f"{added} new entries added, {ignored} ignored, {failed} failed to process. "
+                           "<a href='/view_history' class='alert-link'>View History</a>")
+            flash(Markup(end_message))
         except Exception as e:
             flash(f"Failed to process file: {str(e)}")
 
