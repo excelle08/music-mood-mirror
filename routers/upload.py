@@ -52,6 +52,7 @@ def _run_history_upload(app_context, filepath, request_id, user_id):
 
     num_total = len(history_data)
     num_added = 0
+    found_lyrics = 0
     prev_time = time.time()
 
     current_app.logger.info(f"Total entries to process: {num_total}")
@@ -101,11 +102,24 @@ def _run_history_upload(app_context, filepath, request_id, user_id):
             skipped=s.skipped,
             seconds_played=s.seconds_played,
         )
+
+        res = s.search_lyrics()
+        if res and s.lyrics:
+            row.lyrics = s.lyrics
+            row.synced_lyrics = s.synced_lyrics
+            row.result_title = s.result_title
+            row.result_artist = s.result_artist
+            row.result_album = s.result_album
+            row.duration = s.duration
+            if s.duration and s.seconds_played:
+                row.music_completion_rate = s.music_completion_rate
+            found_lyrics += 1
+
         db.session.add(row)
         num_added += 1
 
 
-    current_app.logger.info(f"Finished processing {num_total} entries, {num_added} added.")
+    current_app.logger.info(f"Finished processing {num_total} entries, {num_added} added, {found_lyrics} found lyrics.")
     progress = db.session.get(RequestProgress, request_id)
     db.session.delete(progress)
     db.session.commit()
