@@ -37,6 +37,8 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password_hash, password):
             session['user_id'] = user.id
+            session['username'] = user.username
+            session['email'] = user.email
             flash('Login successful.')
             return redirect(url_for('history.upload_history'))
         else:

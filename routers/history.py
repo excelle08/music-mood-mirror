@@ -77,7 +77,7 @@ def view_history():
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
     pagination = ListenHistory.query.filter_by(user_id=session['user_id']) \
-        .order_by(ListenHistory.play_datetime.desc()) \
+        .order_by(ListenHistory.play_datetime.asc()) \
         .paginate(page=page, per_page=per_page, error_out=False)
     
     return render_template(
