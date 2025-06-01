@@ -50,3 +50,24 @@ def upload_history():
         return redirect(url_for('history.upload_history'))
 
     return render_template('upload_history.html')
+
+
+@history.route('/view_history')
+def view_history():
+    if 'user_id' not in session:
+        flash('Please log in to view your history.')
+        return redirect(url_for('auth.login'))
+
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 20, type=int)
+    pagination = ListenHistory.query.filter_by(user_id=session['user_id']) \
+        .order_by(ListenHistory.play_datetime.desc()) \
+        .paginate(page=page, per_page=per_page, error_out=False)
+    
+    return render_template(
+        'view_history.html',
+        history=pagination.items,
+        pagination=pagination,
+        page=page,
+        per_page=per_page
+    )

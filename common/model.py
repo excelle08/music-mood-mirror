@@ -110,3 +110,13 @@ class ListenHistory(Model):
     repeats_this_week = db.Column(db.Integer)
     repeats_next_7d = db.Column(db.Integer)
     
+
+
+class RequestProgress(Model):
+    __tablename__ = 'request_progress'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    num_total = db.Column(db.Integer, default=0)
+    num_processed = db.Column(db.Integer, default=0)
+    num_successful = db.Column(db.Integer, default=0)
