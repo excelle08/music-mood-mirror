@@ -1,6 +1,6 @@
 
 document.addEventListener("DOMContentLoaded", () => {
-  const enrichBtn = document.getElementById("enrich-btn");
+  const form = document.getElementById("upload-form");
   const modalEl = document.getElementById("progressModal");
   const modal = new bootstrap.Modal(modalEl);
   const processedSpan = document.getElementById("processed-count");
@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const successSpan = document.getElementById("success-count");
   const progressBar = document.getElementById("progress-bar");
   const closeBtn = document.getElementById("modal-close-btn");
+  const closeWrapper = document.getElementById("modal-close-btn-wrapper");
 
   let pollInterval;
 
@@ -16,15 +17,21 @@ document.addEventListener("DOMContentLoaded", () => {
     closeBtn.classList.remove("d-none");
   };
 
-  enrichBtn.addEventListener("click", async () => {
-    const response = await fetch("/api/enrich_lyrics", {
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const fileInput = document.getElementById("history_file");
+    const formData = new FormData();
+    formData.append("history_file", fileInput.files[0]);
+
+    const res = await fetch("/api/upload_history", {
       method: "POST",
-      headers: { "Content-Type": "application/json" }
+      body: formData
     });
 
-    const result = await response.json();
-    if (!response.ok || !result.request_id) {
-      alert("Failed to start enrichment.");
+    const result = await res.json();
+    if (!res.ok || !result.request_id) {
+      alert("Failed to start upload.");
       return;
     }
 
@@ -33,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     totalSpan.textContent = "?";
     successSpan.textContent = "0";
     progressBar.style.width = "0%";
-    closeBtn.classList.add("d-none");
+    closeWrapper.classList.add("d-none");
 
     const requestId = result.request_id;
 
@@ -42,17 +49,19 @@ document.addEventListener("DOMContentLoaded", () => {
       const data = await res.json();
 
       if (res.status === 404 || (data.num_processed === data.num_total && data.num_total > 0)) {
+        console.log("Stopping polling, either not found or completed.");
+        console.log(data);
+        console.log(res.status);
         stopPolling();
         progressBar.style.width = "100%";
         processedSpan.textContent = totalSpan.textContent;
-        closeBtn.classList.remove("d-none");
+        closeWrapper.classList.remove("d-none");
         return;
       }
 
       processedSpan.textContent = data.num_processed;
       totalSpan.textContent = data.num_total;
       successSpan.textContent = data.num_successful;
-
       const percent = data.num_total ? Math.round((data.num_processed / data.num_total) * 100) : 0;
       progressBar.style.width = percent + "%";
     }, 1000);
@@ -64,6 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   closeBtn.addEventListener("click", () => {
     modal.hide();
-    location.reload();
+    location.href = "/view_history";
   });
 });

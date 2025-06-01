@@ -3,12 +3,37 @@
 {% block content %}
 <div class="container mt-4">
   <h2>Upload Spotify Listening History</h2>
-  <form method="post" enctype="multipart/form-data">
+  <form id="upload-form" enctype="multipart/form-data">
     <div class="mb-3">
       <label for="history_file" class="form-label">Select JSON file</label>
       <input type="file" class="form-control" id="history_file" name="history_file" accept=".json" required>
     </div>
     <button type="submit" class="btn btn-success">Upload</button>
   </form>
+
+<!-- Modal -->
+<div class="modal fade" id="progressModal" tabindex="-1" aria-labelledby="progressModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Uploading History</h5>
+      </div>
+      <div class="modal-body">
+        <div class="progress mb-2">
+          <div id="progress-bar" class="progress-bar progress-bar-striped bg-info"
+               role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">
+          </div>
+        </div>
+        <p>Processed: <span id="processed-count">0</span> / <span id="total-count">?</span></p>
+        <p>Successful: <span id="success-count">0</span></p>
+      </div>
+      <div class="modal-footer d-none" id="modal-close-btn-wrapper">
+        <button type="button" class="btn btn-primary" id="modal-close-btn">View My History</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
 </div>
 {% endblock %}

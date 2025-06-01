@@ -84,6 +84,7 @@ def _run_enrichment(app_context, request_id, user_id):
 
         curr_time = time.time()
         if curr_time - prev_time > 1:
+            prev_time = curr_time
             progress = db.session.get(RequestProgress, request_id)
             progress.num_total = len(entries)
             progress.num_processed = num_processed
