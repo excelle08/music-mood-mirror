@@ -76,14 +76,27 @@ def view_history():
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 20, type=int)
-    pagination = ListenHistory.query.filter_by(user_id=session['user_id']) \
-        .order_by(ListenHistory.play_datetime.asc()) \
-        .paginate(page=page, per_page=per_page, error_out=False)
-    
+    only_lyrics = request.args.get('only_lyrics', '0') == '1'
+    min_seconds = request.args.get('min_seconds', 90, type=int)
+    min_completion = request.args.get('min_completion', 50, type=int) / 100.0
+
+    query = ListenHistory.query.filter_by(user_id=session['user_id'])
+
+    if only_lyrics:
+        query = query.filter(ListenHistory.lyrics.isnot(None))
+    query = query.filter(ListenHistory.seconds_played >= min_seconds)
+    query = query.filter(ListenHistory.music_completion_rate >= min_completion)
+
+    pagination = query.order_by(ListenHistory.play_datetime.desc())\
+                      .paginate(page=page, per_page=per_page, error_out=False)
+
     return render_template(
         'view_history.html',
         history=pagination.items,
         pagination=pagination,
         page=page,
-        per_page=per_page
+        per_page=per_page,
+        only_lyrics=only_lyrics,
+        min_seconds=min_seconds,
+        min_completion=int(min_completion * 100)
     )
