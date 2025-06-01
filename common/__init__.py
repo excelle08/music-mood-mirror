@@ -5,10 +5,12 @@ from flask import Flask, Response, render_template, jsonify
 from werkzeug.exceptions import default_exceptions
 from common.errors import APIError
 from common.model import db
-from config.settings import SQLITE_DB_URI
+from config.settings import SQLITE_DB_URI, SECRET_KEY
 from routers.error_maker import error_blueprint
 from routers.home import home_blueprint
 from routers.lyrics_api import lyrics_api
+from routers.auth import auth
+from routers.history import history
 
 
 def create_app():
@@ -18,13 +20,19 @@ def create_app():
     )
     app.config['SQLALCHEMY_DATABASE_URI'] = SQLITE_DB_URI
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.secret_key = SECRET_KEY
     db.init_app(app)
 
     app.register_blueprint(error_blueprint)
     app.register_blueprint(home_blueprint)
     app.register_blueprint(lyrics_api)
+    app.register_blueprint(auth)
+    app.register_blueprint(history)
 
     register_error_handler(app)
+
+    with app.app_context():
+        db.create_all()
 
     return app
 
@@ -66,4 +74,5 @@ def handle_http_error(error):
         }),
         status=code
     )
+
 

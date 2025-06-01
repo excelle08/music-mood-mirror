@@ -104,7 +104,7 @@ class ListenHistory(Model):
     reason_start = db.Column(db.String(64))
     reason_end = db.Column(db.String(64))
     shuffle = db.Column(db.Boolean, default=False)
-    skip = db.Column(db.Boolean, default=False)
+    skipped = db.Column(db.Boolean, default=False)
     week = db.Column(db.Integer)
     first_occurrence_in_week = db.Column(db.Boolean, default=False)
     repeats_this_week = db.Column(db.Integer)

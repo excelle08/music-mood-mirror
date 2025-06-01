@@ -7,3 +7,4 @@ data/*.json
 data/yearly
 data/*.db
 data/*.zip
+instance/
