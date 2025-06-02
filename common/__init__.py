@@ -14,6 +14,7 @@ from routers.history import history
 from routers.enrich import enrich_api
 from routers.upload import upload_api
 from routers.analyze import analyze_api
+from routers.analysis import analysis
 
 
 def create_app():
@@ -34,6 +35,7 @@ def create_app():
     app.register_blueprint(enrich_api)
     app.register_blueprint(upload_api)
     app.register_blueprint(analyze_api)
+    app.register_blueprint(analysis)
 
     register_error_handler(app)
 
@@ -80,4 +82,5 @@ def handle_http_error(error):
         }),
         status=code
     )
+
 
