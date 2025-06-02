@@ -46,7 +46,38 @@ def top_repeats_weekly():
                 "repeat_count": len(plays),
                 "title": song_key[0],
                 "artist": song_key[1],
-                "avg_completion": round(avg_completion * 100, 1)
+                "avg_completion": round(avg_completion, 1)
             })
 
     return jsonify(result)
+
+
+@analysis.route('/api/histograms')
+def histograms():
+    if 'user_id' not in session:
+        return jsonify({'error': 'unauthorized'}), 401
+
+    entries = ListenHistory.query.filter(
+        ListenHistory.user_id == session['user_id'],
+        ListenHistory.music_completion_rate.isnot(None),
+        ListenHistory.seconds_played.isnot(None)
+    ).all()
+
+    # Completion rate buckets: 0-10%, 10-20%, ..., 90-100%
+    completion_buckets = [0] * 11  # 10 buckets + >100% in 100%
+    for e in entries:
+        rate = min(e.music_completion_rate, 100)
+        idx = min(int(rate // 10), 10)
+        completion_buckets[idx] += 1
+
+    # Seconds played buckets: 0–30, ..., 330–360 (12 buckets)
+    seconds_buckets = [0] * 13
+    for e in entries:
+        sec = min(e.seconds_played, 360)
+        idx = min(int(sec // 30), 12)
+        seconds_buckets[idx] += 1
+
+    return jsonify({
+        "completion_rate": completion_buckets,
+        "seconds_played": seconds_buckets
+    })
