@@ -9,6 +9,10 @@ home_blueprint = Blueprint('home', __name__)
 def hello():
     raise APIError(status_code=200, message='Hello World')
 
-@home_blueprint.route('/', methods=['GET'])
+@home_blueprint.route('/test', methods=['GET'])
+def test():
+    return render_template('test.html')
+
+@home_blueprint.route('/')
 def index():
-    return render_template('index.html')
+    return render_template("index.html")
