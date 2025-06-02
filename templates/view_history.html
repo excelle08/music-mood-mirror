@@ -22,8 +22,9 @@
   </div>
   <div class="col-12">
     <button type="submit" class="btn btn-primary">Apply</button>
-  </div>
+</div>
 </form>
+
 
 <!-- Lyrics Modal -->
 <div class="modal fade" id="lyricsModal" tabindex="-1" aria-labelledby="lyricsModalLabel" aria-hidden="true">
@@ -41,6 +42,28 @@
     </div>
   </div>
 </div>
+
+<!-- Analyze Progress Modal -->
+<div class="modal fade" id="analyzeModal" tabindex="-1" aria-labelledby="analyzeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="analyzeModalLabel">Analyzing History</h5>
+      </div>
+      <div class="modal-body">
+        <div class="progress mb-2">
+          <div id="analyze-progress-bar" class="progress-bar progress-bar-striped bg-info"
+               role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">
+          </div>
+        </div>
+        <p>Processed: <span id="analyze-processed">0</span> / <span id="analyze-total">?</span></p>
+      </div>
+      <div class="modal-footer d-none" id="analyze-close-wrapper">
+        <button type="button" class="btn btn-secondary" id="analyze-close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
 function showLyrics(lyrics) {
   document.getElementById("lyricsContent").textContent = lyrics || "(No lyrics available)";
@@ -50,6 +73,7 @@ function showLyrics(lyrics) {
 </script>
   <button id="enrich-btn" class="btn btn-warning mb-3">Enrich Missing Lyrics</button>
 
+  <button id="analyze-btn" class="btn btn-outline-success">Analyze History</button>
   <!-- Modal -->
   <div class="modal fade" id="progressModal" tabindex="-1" aria-labelledby="progressModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -84,6 +108,10 @@ function showLyrics(lyrics) {
           <th>Completion Rate</th>
           <th>Start Reason</th>
           <th>Lyrics</th>
+          <th>Week Num</th>
+          <th>First Played in Week?</th>
+          <th>Repeats This Week</th>
+          <th>Repeats Next 7 days</th>
         </tr>
       </thead>
       <tbody>
@@ -104,6 +132,10 @@ function showLyrics(lyrics) {
               ❌
             {% endif %}
           </td>
+          <td>{{ entry.week or '' }}</td>
+          <td>{{ '✔️' if entry.first_occurrence_in_week else '' }}</td>
+          <td>{{ entry.repeats_this_week or '' }}</td>
+          <td>{{ entry.repeats_next_7d or '' }}</td>
         </tr>
         {% endfor %}
       </tbody>
@@ -138,5 +170,6 @@ function showLyrics(lyrics) {
 
 </div>
 
+<script src="{{ url_for('static', filename='js/analyze.js') }}"></script>
 <script src="{{ url_for('static', filename='js/enrich.js') }}"></script>
 {% endblock %}

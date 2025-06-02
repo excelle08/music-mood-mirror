@@ -87,7 +87,7 @@ def view_history():
     query = query.filter(ListenHistory.seconds_played >= min_seconds)
     query = query.filter(ListenHistory.music_completion_rate >= min_completion)
 
-    pagination = query.order_by(ListenHistory.play_datetime.desc())\
+    pagination = query.order_by(ListenHistory.play_datetime.asc())\
                       .paginate(page=page, per_page=per_page, error_out=False)
 
     return render_template(
