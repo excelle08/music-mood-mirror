@@ -3,7 +3,6 @@ from flask import Blueprint, render_template, jsonify, session
 from common.model import db, ListenHistory
 from collections import defaultdict
 from datetime import datetime, timedelta
-import calendar
 
 analysis = Blueprint('analysis', __name__)
 
@@ -18,13 +17,11 @@ def top_repeats_weekly():
     if 'user_id' not in session:
         return jsonify({'error': 'unauthorized'}), 401
 
-    # Fetch relevant history
     entries = ListenHistory.query.filter(
         ListenHistory.user_id == session['user_id'],
         ListenHistory.week.isnot(None)
     ).all()
 
-    # Group by (year, week) → then (title, artist) → list of entries
     week_map = defaultdict(lambda: defaultdict(list))
     for entry in entries:
         date = entry.play_datetime.date()
@@ -34,20 +31,22 @@ def top_repeats_weekly():
 
     result = []
     for (year, week), song_groups in sorted(week_map.items()):
-        top_song, plays = max(song_groups.items(), key=lambda x: len(x[1]))
-        avg_completion = sum(e.music_completion_rate for e in plays if e.music_completion_rate) / len(plays)
+        top_songs = sorted(song_groups.items(), key=lambda x: len(x[1]), reverse=True)[:3]
         start_date = datetime.strptime(f"{year}-W{week}-1", "%G-W%V-%u").date()
         end_date = start_date + timedelta(days=6)
         label = f"{year}-W{week}"
 
-        result.append({
-            "label": label,
-            "week_start": start_date.isoformat(),
-            "week_end": end_date.isoformat(),
-            "repeat_count": len(plays),
-            "title": top_song[0],
-            "artist": top_song[1],
-            "avg_completion": round(avg_completion * 100, 1)
-        })
+        for rank, (song_key, plays) in enumerate(top_songs, start=1):
+            avg_completion = sum(e.music_completion_rate for e in plays if e.music_completion_rate) / len(plays)
+            result.append({
+                "label": label,
+                "rank": rank,
+                "week_start": start_date.isoformat(),
+                "week_end": end_date.isoformat(),
+                "repeat_count": len(plays),
+                "title": song_key[0],
+                "artist": song_key[1],
+                "avg_completion": round(avg_completion * 100, 1)
+            })
 
     return jsonify(result)
