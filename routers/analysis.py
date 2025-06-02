@@ -46,7 +46,7 @@ def top_repeats_weekly():
                 "repeat_count": len(plays),
                 "title": song_key[0],
                 "artist": song_key[1],
-                "avg_completion": round(avg_completion * 100, 1)
+                "avg_completion": round(avg_completion, 1)
             })
 
     return jsonify(result)
@@ -66,7 +66,7 @@ def histograms():
     # Completion rate buckets: 0-10%, 10-20%, ..., 90-100%
     completion_buckets = [0] * 11  # 10 buckets + >100% in 100%
     for e in entries:
-        rate = min(e.music_completion_rate * 100, 100)
+        rate = min(e.music_completion_rate, 100)
         idx = min(int(rate // 10), 10)
         completion_buckets[idx] += 1
 
