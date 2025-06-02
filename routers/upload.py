@@ -36,6 +36,20 @@ def upload_history_async():
     return jsonify({'request_id': progress.id})
 
 
+def _populate_history(spotify_history_entry, i):
+    s = Song.from_spotify(spotify_history_entry)
+    if not s:
+        current_app.logger.warning(f"Failed to parse the entry {i}")
+        return None
+
+    if not s.title or not s.artist or not s.play_datetime:
+        current_app.logger.warning(f"Skipping entry {i} due to missing required fields")
+        return None
+
+    s.search_lyrics()
+    return s
+
+
 def _run_history_upload(app_context, filepath, request_id, user_id):
     app_context.push()
 
@@ -72,13 +86,12 @@ def _run_history_upload(app_context, filepath, request_id, user_id):
             )
             prev_time = time.time()
 
-        s = Song.from_spotify(entry)
-        if not s:
-            current_app.logger.warning(f"Failed to parse the entry {i}")
-            continue
+        if "spotify_track_uri" in entry:
+            s = _populate_history(entry, i)
+        else:
+            s = Song.from_dict(entry)
 
-        if not s.title or not s.artist or not s.play_datetime:
-            current_app.logger.warning(f"Skipping entry {i} due to missing required fields")
+        if not s:
             continue
 
         exists = ListenHistory.query.filter_by(
@@ -103,8 +116,7 @@ def _run_history_upload(app_context, filepath, request_id, user_id):
             seconds_played=s.seconds_played,
         )
 
-        res = s.search_lyrics()
-        if res and s.lyrics:
+        if s.lyrics:
             row.lyrics = s.lyrics
             row.synced_lyrics = s.synced_lyrics
             row.result_title = s.result_title

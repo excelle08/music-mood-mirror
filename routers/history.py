@@ -78,7 +78,7 @@ def view_history():
     per_page = request.args.get('per_page', 20, type=int)
     only_lyrics = request.args.get('only_lyrics', '0') == '1'
     min_seconds = request.args.get('min_seconds', 90, type=int)
-    min_completion = request.args.get('min_completion', 50, type=int) / 100.0
+    min_completion = request.args.get('min_completion', 50, type=int)
 
     query = ListenHistory.query.filter_by(user_id=session['user_id'])
 
@@ -98,5 +98,5 @@ def view_history():
         per_page=per_page,
         only_lyrics=only_lyrics,
         min_seconds=min_seconds,
-        min_completion=int(min_completion * 100)
+        min_completion=int(min_completion)
     )

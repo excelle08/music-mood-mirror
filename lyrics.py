@@ -175,6 +175,37 @@ class Song:
             obj.seconds_played = song["ms_played"] / 1000
         return obj
 
+    @classmethod
+    def from_dict(cls, song_dict: dict):
+        """
+        Create a Song object from a dictionary.
+        :param song_dict: A dictionary representing a song.
+        :return: A Song object if creation is successful, or None.
+        """
+        try:
+            s = cls(
+                title=song_dict["title"],
+                artist=song_dict["artist"],
+                album=song_dict.get("album"),
+                play_datetime=song_dict.get("play_datetime"),
+                reason_start=song_dict.get("reason_start"),
+                reason_end=song_dict.get("reason_end"),
+                shuffle=song_dict.get("shuffle"),
+                skipped=song_dict.get("skipped")
+            )
+            s.result_title = song_dict.get("result_title")
+            s.result_artist = song_dict.get("result_artist")
+            s.result_album = song_dict.get("result_album")
+            s.duration = song_dict.get("duration")
+            s.seconds_played = song_dict.get("seconds_played")
+            s.music_completion_rate = song_dict.get("music_completion_rate")
+            s.lyrics = song_dict.get("lyrics")
+            s.synced_lyrics = song_dict.get("synced_lyrics")
+            return s
+        except KeyError as e:
+            print(f"Missing key in song dictionary: {e}", file=sys.stderr)
+            return None
+
 
 def search(song: dict) -> Song:
     """

@@ -31,7 +31,7 @@ def _run_analysis(app_context, request_id, user_id):
 
     entries = ListenHistory.query.filter(
         ListenHistory.user_id == user_id,
-        ListenHistory.music_completion_rate >= 0.5,
+        ListenHistory.music_completion_rate >= 50,
         ListenHistory.seconds_played >= 90,
         ListenHistory.play_datetime.isnot(None)
     ).order_by(ListenHistory.play_datetime.asc()).all()
