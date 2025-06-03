@@ -1,8 +1,9 @@
 
-from flask import Blueprint, render_template, jsonify, session
+from flask import Blueprint, render_template, jsonify, session, current_app
 from common.model import db, ListenHistory
 from collections import defaultdict
 from datetime import datetime, timedelta
+import json
 
 analysis = Blueprint('analysis', __name__)
 
@@ -115,9 +116,24 @@ def mood_api():
     current = datetime.strptime(f"{start_year}-W{start_week}-1", "%G-W%V-%u").date()
     end = datetime.strptime(f"{end_year}-W{end_week}-1", "%G-W%V-%u").date()
 
+    # Check for the weekly mood score file
+    weekly_mood_scores = {}
+    use_file = False
+    try:
+        with open('weekly_mood_scores.json', 'r') as f:
+            weekly_mood_scores = json.load(f)
+            use_file = True
+    except FileNotFoundError:
+        current_app.logger.warning("weekly_mood_scores.json not found, generating random scores.")
+        pass
+
     while current <= end:
         year, week, _ = current.isocalendar()
-        score = round(random.uniform(1, 5), 2)
+        if use_file:
+            score = weekly_mood_scores.get(f"{year}-W{week}", 0)
+            score = round(score, 2)
+        else:
+            score = round(random.uniform(1, 5), 2)
         week_data.append({
             "label": f"{year}-W{week}",
             "score": score

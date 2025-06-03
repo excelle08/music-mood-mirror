@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       responsive: true,
       scales: {
         y: {
-          min: 1,
+          min: 0,
           max: 5,
           title: {
             display: true,
