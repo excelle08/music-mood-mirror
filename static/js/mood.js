@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const pointColors = scores.map(getColor);
 
-  new Chart(document.getElementById("moodChart").getContext("2d"), {
+  const chart = new Chart(document.getElementById("moodChart").getContext("2d"), {
     type: "line",
     data: {
       labels: labels,
@@ -58,4 +58,39 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     }
   });
+
+
+  chart.canvas.onclick = function (event) {
+      const points = chart.getElementsAtEventForMode(event, 'nearest', { intersect: true }, true);
+      if (points.length > 0) {
+          const point = points[0];
+          const label = chart.data.labels[point.index]; // label like '2025-W22'
+          const [year, week] = label.split('-W').map(Number);
+
+          fetch(`/api/weekly_tags?year=${year}&week=${week}`)
+              .then(response => response.json())
+              .then(data => renderWordCloud(data))
+              .catch(error => console.error('Failed to fetch mood tags:', error));
+      }
+  };
 });
+
+
+function renderWordCloud(tags) {
+    const list = tags.map(([tag, weight]) => [tag, weight]);
+    WordCloud(document.getElementById('word-cloud'), {
+        list: list,
+        gridSize: 10,
+        weightFactor: 5,
+        fontFamily: 'Times, serif',
+        color: 'random-dark',
+        backgroundColor: '#f0f0f0'
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const chart = window.moodChart;  // assuming moodChart is globally available
+    if (!chart) return;
+
+});
+        

@@ -1,8 +1,9 @@
 
-from flask import Blueprint, render_template, jsonify, session, current_app
+from flask import Blueprint, render_template, jsonify, session, current_app, request
 from common.model import db, ListenHistory
 from collections import defaultdict
 from datetime import datetime, timedelta
+from sqlalchemy import extract
 import json
 
 analysis = Blueprint('analysis', __name__)
@@ -141,3 +142,33 @@ def mood_api():
         current += timedelta(days=7)
 
     return jsonify(week_data)
+
+
+@analysis.route('/api/weekly_tags')
+def get_weekly_tags():
+    year = int(request.args.get('year'))
+    week = int(request.args.get('week'))
+
+    entries = ListenHistory.query.filter(
+        ListenHistory.user_id == session['user_id'],
+        ListenHistory.first_occurrence_in_week == True,
+        #extract('year', ListenHistory.play_datetime) == year,
+        ListenHistory.week == week
+    ).all()
+
+    current_app.logger.info(f"Fetching tags for week {week} of {year}, found {len(entries)} entries.")
+
+    tag_weights = defaultdict(float)
+    for entry in entries:
+        try:
+            tags = json.loads(entry.mood_tags_local or '[]')
+        except Exception as e:
+            current_app.logger.error(f"Failed to parse mood_tags for entry {entry.id}, skipping: {e}")
+            continue
+        for tag in tags:
+            tag_weights[tag] += entry.repeats_this_week or 1
+
+    sorted_tags = sorted(tag_weights.items(), key=lambda x: x[1], reverse=True)[:20]
+
+    return jsonify(sorted_tags)
+        
