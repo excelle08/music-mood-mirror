@@ -22,10 +22,10 @@ class Song:
                  album: Optional[str] = None, play_datetime: Optional[str] = None,
                  reason_start: Optional[str] = None, reason_end: Optional[str] = None,
                  shuffle: Optional[bool] = None, skipped: Optional[bool] = None):
-        self.title = title
-        self.artist = artist
-        self.album = album
-        self.lyrics = None
+        self.title: str = title
+        self.artist: str = artist
+        self.album: Optional[str] = album
+        self.lyrics: Optional[str] = None
         # If play_datetime is supplied, convert it to a datetime object
         # The datetime should be in ISO format
         if play_datetime is not None:
@@ -34,17 +34,27 @@ class Song:
             except ValueError:
                 print(f"Invalid datetime format: {play_datetime}")
                 self.play_datetime = None
-        self.result_title = None
-        self.result_artist = None
-        self.result_album = None
-        self.duration = None
-        self.seconds_played = None
-        self.music_completion_rate = None
-        self.synced_lyrics = None
-        self.reason_start = reason_start
-        self.reason_end = reason_end
-        self.shuffle = shuffle
-        self.skipped = skipped
+        self.result_title: Optional[str] = None
+        self.result_artist: Optional[str] = None
+        self.result_album: Optional[str] = None
+        self.duration: Optional[str] = None
+        self.seconds_played: Optional[str] = None
+        self.music_completion_rate: Optional[str] = None
+        self.synced_lyrics: Optional[str] = None
+        self.reason_start: Optional[str] = reason_start
+        self.reason_end: Optional[str] = reason_end
+        self.shuffle: Optional[str] = shuffle
+        self.skipped: Optional[str] = skipped
+        self.mood_tags: Optional[list[str]] = None
+        self.positivity_score: Optional[float] = None
+        self.mood_tags_local: Optional[list[str]] = None
+        self.positivity_score_local: Optional[float] = None
+        self.positivity_score_local_wghted: Optional[float] = None
+        self.repeats_this_week: Optional[int] = None
+        self.week: Optional[int] = None
+        self.first_occurrence_in_week: Optional[bool] = None
+        self.repeats_next_7d: Optional[int] = None
+
 
     def __str__(self):
         return f"Title: {self.title}, Artist: {self.artist}, Album: {self.album}"
@@ -74,6 +84,15 @@ class Song:
             "reason_end": self.reason_end,
             "shuffle": self.shuffle,
             "skipped": self.skipped,
+            "mood_tags": self.mood_tags,
+            "positivity_score": self.positivity_score,
+            "mood_tags_local": self.mood_tags_local,
+            "positivity_score_local": self.positivity_score_local,
+            "positivity_score_local_wghted": self.positivity_score_local_wghted,
+            "repeats_this_week": self.repeats_this_week,
+            "week": self.week,
+            "first_occurrence_in_week": self.first_occurrence_in_week,
+            "repeats_next_7d": self.repeats_next_7d,
         }
 
     def search_lyrics(self, retry_count: int = 3) -> dict:
@@ -201,6 +220,15 @@ class Song:
             s.music_completion_rate = song_dict.get("music_completion_rate")
             s.lyrics = song_dict.get("lyrics")
             s.synced_lyrics = song_dict.get("synced_lyrics")
+            s.mood_tags = song_dict.get("mood_tags")
+            s.positivity_score = song_dict.get("positivity_score")
+            s.mood_tags_local = song_dict.get("mood_tags_local")
+            s.positivity_score_local = song_dict.get("positivity_score_local")
+            s.positivity_score_local_wghted = song_dict.get("positivity_score_local_wghted")
+            s.repeats_this_week = song_dict.get("repeats_this_week")
+            s.week = song_dict.get("week")
+            s.first_occurrence_in_week = song_dict.get("first_occurrence_in_week")
+            s.repeats_next_7d = song_dict.get("repeats_next_7d")
             return s
         except KeyError as e:
             print(f"Missing key in song dictionary: {e}", file=sys.stderr)

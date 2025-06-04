@@ -127,6 +127,21 @@ def _run_history_upload(app_context, filepath, request_id, user_id):
                 row.music_completion_rate = s.music_completion_rate
             found_lyrics += 1
 
+        if s.week is not None:
+            row.week = s.week
+            row.first_occurrence_in_week = s.first_occurrence_in_week
+            row.repeats_this_week = s.repeats_this_week
+            row.repeats_next_7d = s.repeats_next_7d
+
+        if s.mood_tags is not None:
+            row.mood_tags = json.dumps(s.mood_tags)
+            row.positivity_score = s.positivity_score
+
+        if s.mood_tags_local is not None:
+            row.mood_tags_local = json.dumps(s.mood_tags_local)
+            row.positivity_score_local = s.positivity_score_local
+            row.positivity_score_local_wghted = s.positivity_score_local_wghted
+
         db.session.add(row)
         num_added += 1
 
