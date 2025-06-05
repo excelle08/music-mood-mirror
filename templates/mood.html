@@ -7,5 +7,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{{ url_for('static', filename='js/mood.js') }}"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/wordcloud2.js/1.1.2/wordcloud2.min.js"></script>
-<div id="word-cloud" style="width: 600px; height: 400px; margin: 1rem auto;"></div>
+
+        <div id="instruction-msg" style="text-align:center; font-size:1.1rem; margin-top:1.5rem; color:#555;">
+            Click a point on the mood tracker chart to view the weekly mood tag cloud.
+        </div>
+        <div id="word-cloud" style="width: 90%; max-width: 800px; height: 50vh; margin: 1rem auto;"></div>
 {% endblock %}
