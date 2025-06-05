@@ -1,1 +1,5 @@
 data_YTB/*
+data/*
+prompts.py
+llamacpp.py
+# verify_results.ipynb
