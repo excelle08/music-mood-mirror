@@ -50,6 +50,37 @@ def _populate_history(spotify_history_entry, i):
     return s
 
 
+def _update_history(db_entry, song_entry):
+    found_lyrics = 0
+    if song_entry.lyrics:
+        db_entry.lyrics = song_entry.lyrics
+        db_entry.synced_lyrics = song_entry.synced_lyrics
+        db_entry.result_title = song_entry.result_title
+        db_entry.result_artist = song_entry.result_artist
+        db_entry.result_album = song_entry.result_album
+        db_entry.duration = song_entry.duration
+        if song_entry.duration and song_entry.seconds_played:
+            db_entry.music_completion_rate = song_entry.music_completion_rate
+        found_lyrics += 1
+
+    if song_entry.week is not None:
+        db_entry.week = song_entry.week
+        db_entry.first_occurrence_in_week = song_entry.first_occurrence_in_week
+        db_entry.repeats_this_week = song_entry.repeats_this_week
+        db_entry.repeats_next_7d = song_entry.repeats_next_7d
+
+    if song_entry.mood_tags is not None:
+        db_entry.mood_tags = json.dumps(song_entry.mood_tags)
+        db_entry.positivity_score = song_entry.positivity_score
+
+    if song_entry.mood_tags_local is not None:
+        db_entry.mood_tags_local = json.dumps(song_entry.mood_tags_local)
+        db_entry.positivity_score_local = song_entry.positivity_score_local
+        db_entry.positivity_score_local_wghted = song_entry.positivity_score_local_wghted
+
+    return found_lyrics
+
+
 def _run_history_upload(app_context, filepath, request_id, user_id):
     app_context.push()
 
@@ -101,6 +132,7 @@ def _run_history_upload(app_context, filepath, request_id, user_id):
             play_datetime=s.play_datetime
         ).first()
         if exists:
+            found_lyrics += _update_history(exists, s)
             continue
 
         row = ListenHistory(
@@ -116,31 +148,7 @@ def _run_history_upload(app_context, filepath, request_id, user_id):
             seconds_played=s.seconds_played,
         )
 
-        if s.lyrics:
-            row.lyrics = s.lyrics
-            row.synced_lyrics = s.synced_lyrics
-            row.result_title = s.result_title
-            row.result_artist = s.result_artist
-            row.result_album = s.result_album
-            row.duration = s.duration
-            if s.duration and s.seconds_played:
-                row.music_completion_rate = s.music_completion_rate
-            found_lyrics += 1
-
-        if s.week is not None:
-            row.week = s.week
-            row.first_occurrence_in_week = s.first_occurrence_in_week
-            row.repeats_this_week = s.repeats_this_week
-            row.repeats_next_7d = s.repeats_next_7d
-
-        if s.mood_tags is not None:
-            row.mood_tags = json.dumps(s.mood_tags)
-            row.positivity_score = s.positivity_score
-
-        if s.mood_tags_local is not None:
-            row.mood_tags_local = json.dumps(s.mood_tags_local)
-            row.positivity_score_local = s.positivity_score_local
-            row.positivity_score_local_wghted = s.positivity_score_local_wghted
+        found_lyrics += _update_history(row, s)
 
         db.session.add(row)
         num_added += 1
