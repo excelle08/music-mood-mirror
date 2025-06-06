@@ -50,6 +50,19 @@ function injectAnimationStyles() {
             opacity: 0;
             animation: flyin 0.6s ease forwards;
         }
+        @keyframes flyout {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-40px) scale(0.7);
+            }
+        }
+        #word-cloud span.fly-out {
+            animation: flyout 0.5s ease forwards;
+        }
     `;
     document.head.appendChild(style);
 }
@@ -155,42 +168,64 @@ document.addEventListener("DOMContentLoaded", async () => {
   */
 });
 
-function renderWordCloud(tags) {
-    const container = document.getElementById('word-cloud');
-    container.innerHTML = '';
-    container.style.opacity = 0;
+function animateOldWordsOut(callback) {
+    const oldWords = document.querySelectorAll('#word-cloud span');
+    if (oldWords.length === 0) {
+        callback();
+        return;
+    }
 
-    const maxWeight = Math.max(...tags.map(([_, w]) => w));
-    const width = container.offsetWidth;
-
-    // Scale weight factor based on container width and weight range
-    const baseFactor = width / 5;
-    const factor = maxWeight > 0 ? baseFactor / maxWeight : 10;
-
-    WordCloud(container, {
-        list: tags,
-        gridSize: Math.round(width / 100),
-        weightFactor: factor,
-        fontFamily: 'Segoe UI, sans-serif',
-        color: function(word) {
-            return getColor(word) || (['#3e3e3e', '#5c5c8a', '#666699', '#336666', '#666633'][Math.floor(Math.random() * 5)]);
-        },
-        backgroundColor: '#ffffff',
-        rotateRatio: 0.2,
-        shuffle: true,
-        drawOutOfBound: false
+    oldWords.forEach((el, i) => {
+        el.classList.add('fly-out');
+        el.style.animationDelay = (i * 10) + 'ms';
     });
 
     setTimeout(() => {
-        container.style.transition = 'opacity 0.6s ease-in';
-        container.style.opacity = 1;
-    }, 200);
+        callback();
+    }, 600); // Allow fly-out animation to complete
+}
 
-    setTimeout(() => {
-        injectAnimationStyles();
-        const spans = container.querySelectorAll('span');
-        spans.forEach((el, i) => {
-            el.style.animationDelay = (i * 30) + 'ms';
-        });
-    }, 200);
+function renderWordCloud(tags) {
+    const container = document.getElementById('word-cloud');
+    // container.innerHTML = '';
+    animateOldWordsOut(() => {
+      container.innerHTML = '';
+      // then call WordCloud() here
+
+      container.style.opacity = 0;
+
+      const maxWeight = Math.max(...tags.map(([_, w]) => w));
+      const width = container.offsetWidth;
+
+      // Scale weight factor based on container width and weight range
+      const baseFactor = width / 5;
+      const factor = maxWeight > 0 ? baseFactor / maxWeight : 10;
+
+      WordCloud(container, {
+          list: tags,
+          gridSize: Math.round(width / 100),
+          weightFactor: factor,
+          fontFamily: 'Segoe UI, sans-serif',
+          color: function(word) {
+              return getColor(word) || (['#3e3e3e', '#5c5c8a', '#666699', '#336666', '#666633'][Math.floor(Math.random() * 5)]);
+          },
+          backgroundColor: '#ffffff',
+          rotateRatio: 0.2,
+          shuffle: true,
+          drawOutOfBound: false
+      });
+
+      setTimeout(() => {
+          container.style.transition = 'opacity 0.6s ease-in';
+          container.style.opacity = 1;
+      }, 200);
+
+      setTimeout(() => {
+          injectAnimationStyles();
+          const spans = container.querySelectorAll('span');
+          spans.forEach((el, i) => {
+              el.style.animationDelay = (i * 30) + 'ms';
+          });
+      }, 200);
+    });
 }
