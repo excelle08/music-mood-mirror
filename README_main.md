@@ -1,15 +1,22 @@
 # Table of Contents
 
-1. [Project Description](#project-description)
-    - [Technical Workflow with HP AI Studio](#technical-workflow-with-hp-ai-studio)
-    - [Challenges Addressed & Solutions Developed](#challenges-addressed--solutions-developed)
-    - [Key Features of HP AI Studio Leveraged](#key-features-of-hp-ai-studio-leveraged)
-    - [Lessons Learned & Best Practices](#lessons-learned--best-practices)
-2. [Instructions](#instructions)
-    - [Judging and Testing Steps](#judging-and-testing-steps)
-    - [Input Dataset & Preprocessing](#input-dataset--preprocessing)
-    - [Models Downloaded & Methods Used](#models-downloaded--methods-used)
-    - [Dependencies & Requirements](#dependencies--requirements)
+- [Table of Contents](#table-of-contents)
+- [Project Description](#project-description)
+  - [Technical Workflow with HP AI Studio](#technical-workflow-with-hp-ai-studio)
+  - [Challenges Addressed \& Solutions Developed](#challenges-addressed--solutions-developed)
+  - [Key Features of HP AI Studio Leveraged](#key-features-of-hp-ai-studio-leveraged)
+  - [Lessons Learned \& Best Practices](#lessons-learned--best-practices)
+- [Instructions](#instructions)
+  - [System Requirements](#system-requirements)
+  - [Project Setup](#project-setup)
+    - [1. Clone the Repository](#1-clone-the-repository)
+    - [2. Create and Activate a Python Environment](#2-create-and-activate-a-python-environment)
+    - [3. Install Dependencies](#3-install-dependencies)
+    - [4. Run the Web App](#4-run-the-web-app)
+  - [Judging and Testing Steps](#judging-and-testing-steps)
+  - [Input Dataset \& Preprocessing](#input-dataset--preprocessing)
+  - [Models Downloaded \& Methods Used](#models-downloaded--methods-used)
+  - [Dependencies \& Requirements](#dependencies--requirements)
 
 ---
 
@@ -28,6 +35,47 @@ Highlight the specific features of HP AI Studio that were instrumental, such as 
 Summarize key takeaways from the project, including workflow optimizations, effective use of HP AI Studio features, and recommended practices for similar projects.
 
 # Instructions
+
+## System Requirements
+
+We strongly recommend setting up and running the web app of this project
+in WSL2.
+
+## Project Setup
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/excelle08/music-mood-mirror.git
+cd music-mood-mirror
+```
+
+### 2. Create and Activate a Python Environment
+
+We recommend using Python's virtual environment (`venv`):
+
+```bash
+python3 -m venv venv
+source venv/bin/activate        # On Windows: venv\Scripts\activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the Web App
+
+```bash
+flask run
+```
+
+Then open [http://127.0.0.1:5000](http://127.0.0.1:5000) in your browser, you
+will see a welcome page which gives a brief introduction to this project and
+provides access points to the core features via the sidebar:
+
+![WelcomePage](figures/welcome_page.png)
 
 ## Judging and Testing Steps
 Provide clear, step-by-step instructions for judges or testers to run the project, including environment setup, data access, and evaluation procedures.
