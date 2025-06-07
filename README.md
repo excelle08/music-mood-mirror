@@ -1,9 +1,19 @@
 # music-mood-mirror
-Music-Mood Mirror - An LLM-powered Emotional Wellness Companion by GinkoGreenAI
-🎵 Project Idea: "Music-Mood Mirror" – An LLM-powered Emotional Wellness Companion
+ 🎵Music-Mood Mirror - An LLM-powered Emotional Wellness Companion by GinkoGreenAI
+--
+
+
+We are developing Music Mood Mirror as part of an ongoing hackathon. The project aims to leverage the emotional signals embedded in music listening habits—particularly song lyrics and genres—to infer and track users’ emotional states over time. With the support of Large Language Models (LLMs) for sentiment and thematic analysis of lyrics, our system will provide users with a mood summary for specific periods, visualized through an interactive web dashboard.
+
+While many individuals are naturally attuned to their emotions, this tool is designed with a specific focus on those who struggle with mental health challenges such as depression, anxiety, or bipolar disorder. For these users, emotional self-awareness can fluctuate or be difficult to articulate, making passive monitoring via music a valuable complementary perspective. The system could potentially assist therapists or psychiatrists by offering additional behavioral data points or early warning signals.
+
+Unlike manual mood tracking features available on platforms such as iPhone Health, which rely on users’ ability and discipline to self-report, our solution reduces friction by inferring emotional states passively—based on the music they already listen to. This approach can be especially meaningful for those whose conditions make consistent journaling or self-logging difficult.
+
+By integrating music, AI, and emotional well-being, Music Mood Mirror seeks to contribute to the Healthcare domain through a creative and empathetic lens.
+
 
 🧠 Concept:
-
+--
 Collect user listening history (song titles, artists, timestamps)
 Use LLM to:
 
@@ -20,6 +30,7 @@ Insights like:
 
 
 🩺 Healthcare Tie-In:
+--
 
 Proactive mood tracking for preventative mental health care
 Could link to wellness resources, breathing exercises, music therapy prompts
@@ -28,6 +39,7 @@ Optional: light journaling / chatbot check-ins to track self-perception vs. infe
 
 
 🔧 Architecture Sketch:
+--
 
 Frontend: Upload Spotify export or paste recent listening data
 Backend:
@@ -63,7 +75,7 @@ Output: Generate a natural-language summary like:
 
 
 📆 Suggested 4-Week Timeline
-
+--
 Weekly Goals
 
 
