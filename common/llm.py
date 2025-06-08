@@ -105,6 +105,43 @@ def init_llm_model():
             local_dir=MODEL_DIR,
         )
 
+    print(f"Model file {MODEL_FILE_NAME} is ready at {MODEL_PATH}.")
+
+    global loaded_model
+    loaded_model = Llama(
+        model_path=MODEL_PATH,
+        n_gpu_layers=35,    # n_gpu_layers specifies how many layers to run on the GPU (set to 35 for faster inference if GPU is available).
+        n_ctx=8192,         # n_ctx sets the maximum number of tokens (prompt + response) the model can handle in one inference.
+        # use_mlock=True,   # optional: prevent swap
+        verbose=False,      # verbose=False suppresses detailed logging output.
+    )
+
+
+def test_plain_model():
+    if loaded_model is None:
+        print("Model is not initialized. Please call init_llm_model() first.")
+        return
+
+    prompt = "What is MLflow?"
+    print(f"Testing the model with prompt: {prompt}")
+    result = loaded_model(prompt, temperature=0.0, max_tokens=256, stop=["</s>"])
+    text = result["choices"][0]["text"]
+    print(f"Model output: {text.strip()}")
+
+
+def init_llm_model_with_mlflow():
+    # Download the GGUF file to the current directory if it doesn't exist
+    if not os.path.exists(MODEL_PATH):
+        print(f"Downloading model file {MODEL_FILE_NAME} to {MODEL_DIR}...")
+        os.makedirs(MODEL_DIR, exist_ok=True)
+        hf_hub_download(
+            repo_id=MODEL_REPO_ID,
+            filename=MODEL_FILE_NAME,
+            local_dir=MODEL_DIR,
+        )
+
+    print(f"Model file {MODEL_FILE_NAME} is ready at {MODEL_PATH}.")
+
     # Initialize the MLflow experiment
     print("Initializing experiment in MLflow.")
     mlflow.set_experiment("MusicMoodMirrorAI_Service")
@@ -148,7 +185,7 @@ def load_llm_model(model_uri: str):
 
 if __name__ == "__main__":
     try:
-        model_uri = init_llm_model()
+        model_uri = init_llm_model_with_mlflow()
         load_llm_model(model_uri)
     except Exception as e:
         print(f"Error initializing or loading LLM model: {e}")

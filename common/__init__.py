@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 import os
+import traceback
 from flask import Flask, Response, render_template, jsonify
 from werkzeug.exceptions import default_exceptions
 from common import llm
@@ -20,10 +21,13 @@ from routers.analysis import analysis
 
 def create_app():
     try:
-        model_uri = llm.init_llm_model()
-        llm.load_llm_model(model_uri)
+        llm.init_llm_model()
+        llm.test_plain_model()
+        # llm.load_llm_model(model_uri)
     except Exception as e:
         print(f"Error initializing LLM model: {e}")
+        print("Detailed traceback:")
+        traceback.print_exc()
         print("The web app will still run, but the features that require LLM model may not be available.")
     print("Starting the web app...")
 
