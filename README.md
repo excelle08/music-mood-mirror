@@ -2,10 +2,6 @@
 
 - [Table of Contents](#table-of-contents)
 - [Project Description](#project-description)
-  - [Technical Workflow with HP AI Studio](#technical-workflow-with-hp-ai-studio)
-  - [Challenges Addressed \& Solutions Developed](#challenges-addressed--solutions-developed)
-  - [Key Features of HP AI Studio Leveraged](#key-features-of-hp-ai-studio-leveraged)
-  - [Lessons Learned \& Best Practices](#lessons-learned--best-practices)
 - [Instructions](#instructions)
   - [System Requirements](#system-requirements)
   - [Project Setup](#project-setup)
@@ -37,25 +33,43 @@
       - [Weekly Mood Score](#weekly-mood-score)
       - [Weekly Mood Tags](#weekly-mood-tags)
   - [Models Downloaded \& Methods Used](#models-downloaded--methods-used)
+    - [Gemma-2B Model](#gemma-2b-model)
+    - [Sample Prompt for Mood Tag Inference](#sample-prompt-for-mood-tag-inference)
+    - [Positivity Score Mapping](#positivity-score-mapping)
+    - [Benchmarking](#benchmarking)
 
 ---
 
 # Project Description
+- 🎵Music-Mood Mirror - An LLM-powered Emotional Wellness Companion by GinkoGreenAI
+  We are developing Music Mood Mirror as part of an ongoing hackathon. The project aims to leverage the emotional signals embedded in music listening habits—particularly song lyrics and genres—to infer and track users’ emotional states over time. With the support of Large Language Models (LLMs) for sentiment and thematic analysis of lyrics, our system will provide users with a mood summary for specific periods, visualized through an interactive web dashboard.
 
-## Technical Workflow with HP AI Studio
-Describe the end-to-end workflow implemented using HP AI Studio, including data ingestion, preprocessing, model training, evaluation, and deployment. Highlight how HP AI Studio's interface and automation streamlined these steps.
+  While many individuals are naturally attuned to their emotions, this tool is designed with a specific focus on those who struggle with mental health challenges such as depression, anxiety, or bipolar disorder. For these users, emotional self-awareness can fluctuate or be difficult to articulate, making passive monitoring via music a valuable complementary perspective. The system could potentially assist therapists or psychiatrists by offering additional behavioral data points or early warning signals.
 
-## Challenges Addressed & Solutions Developed
-Outline the main technical and domain-specific challenges encountered during the project. Explain the solutions developed, such as data augmentation, model selection, or custom pipeline creation.
+  Unlike manual mood tracking features available on platforms such as iPhone Health, which rely on users’ ability and discipline to self-report, our solution reduces friction by inferring emotional states passively—based on the music they already listen to. This approach can be especially meaningful for those whose conditions make consistent journaling or self-logging difficult.
 
-## Key Features of HP AI Studio Leveraged
-Highlight the specific features of HP AI Studio that were instrumental, such as AutoML, collaborative notebooks, experiment tracking, or integrated model deployment.
+  By integrating music, AI, and emotional well-being, Music Mood Mirror seeks to contribute to the Healthcare domain through a creative and empathetic lens.
 
-## Lessons Learned & Best Practices
-Summarize key takeaways from the project, including workflow optimizations, effective use of HP AI Studio features, and recommended practices for similar projects.
+- 🧠 Concept:
+  Collect user listening history (song titles, artists, timestamps)
+  Use LLM to:
+
+  Analyze lyrics for emotional content (valence, sentiment, recurring themes)
+  Map genre/tempo metadata to affective tone (e.g., ballads vs. upbeat pop)
+  Optionally, incorporate user input like journaling or self-reported mood
+  Output:
+
+  Visual or textual summary of emotional patterns over time
+  Insights like:
+
+  “You've been listening to more melancholic ballads this week, which may suggest lower mood. Want to try a calming playlist or talk to someone?”
+
+- 🩺 Healthcare Tie-In:
+  Proactive mood tracking for preventative mental health care
+  Could link to wellness resources, breathing exercises, music therapy prompts
+  Optional: light journaling / chatbot check-ins to track self-perception vs. inferred mood
 
 # Instructions
-
 ## System Requirements
 
 We strongly recommend setting up and running the web app of this project
@@ -305,3 +319,52 @@ different sizes in the weekly mood cloud to reflect which tags are more signific
 
 ## Models Downloaded & Methods Used
 List all pre-trained or custom models used, with details on their sources, architectures, and the methods applied for training, fine-tuning, or inference.
+
+We used the [Gemma-2B](https://ai.google.dev/gemma) model, running locally via the `llama-cpp-python` framework, as our LLM inference engine to analyze mood tags for each selected song. For each song, the model predicts three emotional tags from a predefined list. Each tag is mapped to a positivity score (1–5) using a dictionary, and the song's overall positivity score is the average of its tags' scores.
+### Sample Prompt for Mood Tag Inference
+
+Below is an example of the prompt used to instruct the LLM to infer mood tags from song lyrics:
+
+```
+    You are an expert in analyzing song lyrics to determine the emotions they convey.
+    Analyze the following song lyrics and return exactly 3 emotion tags that best summarize the emotions conveyed by the song. Only output the tags, in this format: #tag1 #tag2 #tag3.
+    The tags must be adjectives and strictly chosen from the following list: Joyful, Melancholic, Hopeful, Angry, Romantic, Nostalgic, Sad, Energetic, Passionate, Lonely, Uplifting, Bittersweet, Empowering, Heartbroken, Reflective, Playful, Dark, Calm, Longing, Triumphant
+  '''{insert song lyrics here}'''
+```
+### Positivity Score Mapping 
+
+The following dictionary maps each emotional tag to its corresponding positivity score (1–5):
+
+```python
+positivity_dict = {
+  'Joyful': 5,
+  'Melancholic': 2,
+  'Hopeful': 5,
+  'Angry': 1,
+  'Romantic': 4,
+  'Nostalgic': 3,
+  'Sad': 1,
+  'Energetic': 4,
+  'Passionate': 4,
+  'Lonely': 1,
+  'Uplifting': 5,
+  'Bittersweet': 3,
+  'Empowering': 5,
+  'Heartbroken': 1,
+  'Reflective': 3,
+  'Playful': 4,
+  'Dark': 1,
+  'Calm': 4,
+  'Longing': 2,
+  'Triumphant': 5
+}
+```
+
+To optimize efficiency, we only analyze the top 10 most frequently played unique songs per week, as determined by repeat count. The weekly mood score is then calculated as a weighted average of these songs' positivity scores, weighted by their repeat counts.
+
+### Benchmarking
+For benchmarking, we also used the o3-mini model via OpenAI's API to analyze 20 randomly sampled songs, serving as a ground truth for comparison with our local LLM. The chart below illustrates the comparison of positivity scores between Gemma-2B and o3-mini:
+
+![Positivity Score Comparison 1](analysis/comparison-positivity%20score_line_chart.png)
+![Positivity Score Comparison 2](analysis/comparison-positivity%20score.png)
+![Positivity Score Comparison 3](analysis/comparison-distribution%20of%20positivity%20score%20difference.png)
