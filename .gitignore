@@ -8,3 +8,4 @@ data/yearly
 data/*.db
 data/*.zip
 instance/
+mlruns/

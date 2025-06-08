@@ -4,16 +4,21 @@ from mlflow.pyfunc import PythonModel
 from mlflow.models.signature import ModelSignature
 from mlflow.types.schema import Schema, ColSpec, ParamSchema, ParamSpec
 from llama_cpp import Llama
+from huggingface_hub import hf_hub_download
 
 
 HOME = os.environ.get("HOME")
+MODEL_DIR = os.path.join(HOME, "models")
+MODEL_FILE_NAME = "gemma-2b-it.Q4_K_M.gguf"
+MODEL_REPO_ID = "codegood/gemma-2b-it-Q4_K_M-GGUF"
+MODEL_PATH = os.path.join(MODEL_DIR, MODEL_FILE_NAME)
 loaded_model = None
 
 
 class MusicMoodMirrorAIService(PythonModel):
     def __init__(self):
         super().__init__()
-        self.model_path = f"{HOME}/models/gemma-2b-it.Q4_K_M.gguf"
+        self.model_path = MODEL_PATH
         self._llama = Llama(
             model_path=self.model_path,
             n_gpu_layers=35,
@@ -90,12 +95,22 @@ class MusicMoodMirrorAIService(PythonModel):
 
 
 def init_llm_model():
+    # Download the GGUF file to the current directory if it doesn't exist
+    if not os.path.exists(MODEL_PATH):
+        print(f"Downloading model file {MODEL_FILE_NAME} to {MODEL_DIR}...")
+        os.makedirs(MODEL_DIR, exist_ok=True)
+        hf_hub_download(
+            repo_id=MODEL_REPO_ID,
+            filename=MODEL_FILE_NAME,
+            local_dir=MODEL_DIR,
+        )
+
     # Initialize the MLflow experiment
     print("Initializing experiment in MLflow.")
     mlflow.set_experiment("MusicMoodMirrorAI_Service")
 
     # Define required paths
-    model_folder = f"{HOME}/models/gemma-2b-it.Q4_K_M.gguf"
+    model_folder = MODEL_PATH
     demo_folder = "demo"
 
     # Ensure required directories exist before proceeding
