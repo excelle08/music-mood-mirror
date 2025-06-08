@@ -113,4 +113,17 @@ Lyrics: I heard that you're settled down...  
 
 Analyze the emotional tone of this song. List the 2-3 most dominant emotions and provide a 1-sentence summary of how this song might make a listener feel.
 
+# Project_Story
+## Inspiration
 
+## What it does
+
+## How we built it
+
+## Challenges we ran into
+
+## Accomplishments that we're proud of
+
+## What we learned
+
+## What's next for GinkgoGreen
