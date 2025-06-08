@@ -19,6 +19,9 @@ This folder contains Jupyter notebooks and scripts for the Music Mood Mirror pro
 - **RegisterLLM2MLflow.ipynb**  
     Notebook to register the Gemma-2B model with the built-in MLflow service in AIStudio for model management and tracking.
 
+- **example_pickle_files/**  
+    This folder contains example pickle files that generated from or used by the notebooks and scripts in the parent folder.
+
 ## AI Studio Setup Steps
 
 1. **Install Required Libraries**  

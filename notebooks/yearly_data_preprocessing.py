@@ -78,10 +78,9 @@ def batch_preprocess_yearly_data(folder_path:Path, years: list[int]) -> dict[int
     all_processed_songs_by_year = {} # dictionary to hold processed songs for each year
 
     for year in years:
-        # folder_path = r'C:\Users\sarah\Documents\Github\music-mood-mirror\data\input_yearly_filtered\with_lyrics'
         file_path = os.path.join(folder_path, f'{year}.json')
         try:
-            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f: # C:\\Users\\sarah\\Documents\\Github\\music-mood-mirror\\data\\input_yearly_filtered\\with_lyrics\\
+            with open(file_path, 'r', encoding='utf-8', errors='ignore') as f: 
                 yearly_songs = json.load(f)
                 processed_yearly_songs = preprocess_yearly_data(yearly_songs)
                 all_processed_songs_by_year[year] = processed_yearly_songs # list of SongEntry instances
@@ -113,10 +112,8 @@ def clean_lyrics(lyrics: str) -> str:
 # Example usage
 if __name__ == "__main__":
     # Example usage of the batch preprocessing function
-    # This is just a placeholder path, you should replace it with the actual path to your data folder
-    # r'C:\Users\sarah\Documents\Github\music-mood-mirror\data\input_yearly_filtered\with_lyrics'
     years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
-    all_processed_songs_by_year = batch_preprocess_yearly_data(r'C:\Users\sarah\Documents\Github\music-mood-mirror\data\input_yearly_filtered\with_lyrics', years)
+    all_processed_songs_by_year = batch_preprocess_yearly_data('data/sample/processed_with_weeklyfreq', years)
 
 
 # Example input music listening history in a json file

@@ -35,8 +35,8 @@ def get_avg_positivity_score(tags: list) -> float:
 # Example usage
 if __name__ == "__main__":
 
-    years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
-    all_processed_songs_by_year = batch_preprocess_yearly_data(r'C:\Users\sarah\Documents\Github\music-mood-mirror\data\input_yearly_filtered\with_lyrics', years)
+    years = [2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025] # Adjust the years as needed, use 2017 for testing
+    all_processed_songs_by_year = batch_preprocess_yearly_data('data/sample/processed_with_weeklyfreq', years)
 
     # Set your OpenAI API key'''
     os.environ["OPENAI_API_KEY"] = "YOUR_OPENAI_KEY"  # Replace with your actual key
