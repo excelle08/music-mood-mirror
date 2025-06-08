@@ -33,7 +33,6 @@
       - [Weekly Mood Score](#weekly-mood-score)
       - [Weekly Mood Tags](#weekly-mood-tags)
   - [Models Downloaded \& Methods Used](#models-downloaded--methods-used)
-    - [Gemma-2B Model](#gemma-2b-model)
     - [Sample Prompt for Mood Tag Inference](#sample-prompt-for-mood-tag-inference)
     - [Positivity Score Mapping](#positivity-score-mapping)
     - [Benchmarking](#benchmarking)
@@ -305,6 +304,10 @@ previously assigned with a "positivity score" of 1 (most negative) to 5
 song will be the average of the "positivity scores" of the three tags answered
 by the AI.
 
+The prompt we used and the positivity scores assigned to tags are described
+in [Sample Prompt](#sample-prompt-for-mood-tag-inference) and
+[Positivity Score Mapping](#positivity-score-mapping) of the next section.
+
 #### Weekly Mood Score
 
 The weekly mood score will be calculated by weighted average "positivity score"
@@ -318,9 +321,11 @@ songs. Tags are also weighted by `repeats_this_week` so they are displayed in
 different sizes in the weekly mood cloud to reflect which tags are more significant.
 
 ## Models Downloaded & Methods Used
+
 List all pre-trained or custom models used, with details on their sources, architectures, and the methods applied for training, fine-tuning, or inference.
 
 We used the [Gemma-2B](https://ai.google.dev/gemma) model, running locally via the `llama-cpp-python` framework, as our LLM inference engine to analyze mood tags for each selected song. For each song, the model predicts three emotional tags from a predefined list. Each tag is mapped to a positivity score (1–5) using a dictionary, and the song's overall positivity score is the average of its tags' scores.
+
 ### Sample Prompt for Mood Tag Inference
 
 Below is an example of the prompt used to instruct the LLM to infer mood tags from song lyrics:
