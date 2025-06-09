@@ -169,7 +169,7 @@ def init_llm_model_with_mlflow():
         )
         print(f"Registered model with execution ID: {run.info.run_id}")
         print(f"Model registered successfully. Run ID: {run.info.run_id}")
-    
+
     return model_uri
 
 

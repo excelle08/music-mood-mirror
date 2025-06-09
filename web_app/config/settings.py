@@ -15,4 +15,9 @@ DB_PASSWORD = "password"
 DB_NAME = "music"
 MYSQL_DB_URI = f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 SQLITE_DB_URI = "sqlite:///music.db"
+# This secret key is for session management by the app and is not related to
+# any third party APIs
 SECRET_KEY = "R/XvUhoqU1QFExX9lledgg8ThUTBQLpXc6aOYQ73F4hynWBG5K9gTzBTgHXFo6mn"
+# Sleep interval in seconds between using AI to analyze each song's emotion tags
+# On Intel 13/14 Gen CPU you may need to increase this value to avoid BSOD
+AI_INFERENCE_INTERVAL = 0
