@@ -1,7 +1,6 @@
-# Table of Contents
-
-- [Table of Contents](#table-of-contents)
+# **Table of Contents**
 - [Project Description](#project-description)
+- [Repository Structure](#repository-structure)
 - [Instructions](#instructions)
   - [System Requirements](#system-requirements)
   - [Project Setup](#project-setup)
@@ -9,7 +8,7 @@
     - [2. Create and Activate a Python Virtual Environment](#2-create-and-activate-a-python-virtual-environment)
     - [3. Install `llama-cpp-python`](#3-install-llama-cpp-python)
     - [4. Install Dependencies](#4-install-dependencies)
-    - [4. Run the Web App](#4-run-the-web-app)
+    - [5. Run the Web App](#4-run-the-web-app)
   - [Judging and Testing Steps](#judging-and-testing-steps)
     - [1. Register a user account](#1-register-a-user-account)
     - [2. Login](#2-login)
@@ -36,37 +35,74 @@
     - [Sample Prompt for Mood Tag Inference](#sample-prompt-for-mood-tag-inference)
     - [Positivity Score Mapping](#positivity-score-mapping)
     - [Benchmarking](#benchmarking)
-
----
+- [What's next for GinkgoGreen](#-whats-next-for-ginkgogreen)
+- [Accomplishments that we're proud of](#-accomplishments-that-were-proud-of)
+- [What we learned](#-what-we-learned)
 
 # Project Description
-- 🎵Music-Mood Mirror - An LLM-powered Emotional Wellness Companion by GinkoGreenAI
-  We are developing Music Mood Mirror as part of an ongoing hackathon. The project aims to leverage the emotional signals embedded in music listening habits—particularly song lyrics and genres—to infer and track users’ emotional states over time. With the support of Large Language Models (LLMs) for sentiment and thematic analysis of lyrics, our system will provide users with a mood summary for specific periods, visualized through an interactive web dashboard.
+## 🎵 Music Mood Mirror – An LLM-powered Emotional Wellness Companion by *GinkoGreenAI*
 
-  While many individuals are naturally attuned to their emotions, this tool is designed with a specific focus on those who struggle with mental health challenges such as depression, anxiety, or bipolar disorder. For these users, emotional self-awareness can fluctuate or be difficult to articulate, making passive monitoring via music a valuable complementary perspective. The system could potentially assist therapists or psychiatrists by offering additional behavioral data points or early warning signals.
+## 🧠 Inspiration  
+Music often reflects our emotional state—sometimes more honestly than we can express ourselves. While many people intuitively recognize this connection, those navigating mental health challenges like depression, anxiety, or bipolar disorder may struggle with emotional awareness.  
 
-  Unlike manual mood tracking features available on platforms such as iPhone Health, which rely on users’ ability and discipline to self-report, our solution reduces friction by inferring emotional states passively—based on the music they already listen to. This approach can be especially meaningful for those whose conditions make consistent journaling or self-logging difficult.
+**Music Mood Mirror** was born from the idea that our listening habits—especially lyrics and genres—can act as passive signals for emotional trends. By tapping into the music people already love, we aim to offer meaningful emotional insights without the burden of manual tracking or journaling.
 
-  By integrating music, AI, and emotional well-being, Music Mood Mirror seeks to contribute to the Healthcare domain through a creative and empathetic lens.
+### 🏥 Healthcare Relevance  
+**Music Mood Mirror** is directly aligned with the healthcare theme of this hackathon, focusing on **mental wellness and emotional self-awareness**.  
 
-- 🧠 Concept:
-  Collect user listening history (song titles, artists, timestamps)
-  Use LLM to:
+- For individuals with conditions like **depression**, **anxiety**, or **bipolar disorder**, emotional self-tracking can be inconsistent or burdensome.  
+- Our tool provides a **non-intrusive, passive method** for emotional monitoring, supplementing traditional mood journaling.  
+- Insights from the app could potentially be shared with **therapists, psychiatrists, or wellness platforms** to offer early signals of emotional changes or relapses.  
+- The use of LLMs for **emotional signal extraction from natural media (music)** adds a novel angle to digital mental health support.
 
-  Analyze lyrics for emotional content (valence, sentiment, recurring themes)
-  Map genre/tempo metadata to affective tone (e.g., ballads vs. upbeat pop)
-  Optionally, incorporate user input like journaling or self-reported mood
-  Output:
+## ⚙️ What It Does  
+**Music Mood Mirror** is a web app that passively analyzes users’ music listening history to track emotional trends over time. It leverages Large Language Models (LLMs) to extract sentiment, positivity scores, and recurring emotional themes from song lyrics.
 
-  Visual or textual summary of emotional patterns over time
-  Insights like:
 
-  “You've been listening to more melancholic ballads this week, which may suggest lower mood. Want to try a calming playlist or talk to someone?”
+### ✅ Key Features
 
-- 🩺 Healthcare Tie-In:
-  Proactive mood tracking for preventative mental health care
-  Could link to wellness resources, breathing exercises, music therapy prompts
-  Optional: light journaling / chatbot check-ins to track self-perception vs. inferred mood
+- **Input**:  
+  - User-uploaded listening history (song titles, artists, timestamps)  
+
+- **LLM-Powered Analysis**:  
+  - Sentiment and thematic analysis of lyrics  
+  - Emotion tagging and positivity scoring  
+
+- **Output**:  
+  - Weekly stats: play duration, reason, completion %, repeat count  
+  - Mood tags and scores (when user enables “Analyze Mood with AI”)  
+  - Visualizations of emotional themes by week  
+### 💡 Who It’s For  
+Although designed with mental health support in mind, **Music Mood Mirror** is equally valuable for anyone curious about how their music reflects their mood—turning everyday playlists into a mirror for emotional self-awareness.
+Let me know if you’d like a visual diagram or flowchart to include in your submission, or if you need a shorter version for slide decks!
+
+## Repository Structure
+
+```
+music-mood-mirror/
+├── web_app/                          # Main Flask web application source code
+│   ├── static/                       # Static files (CSS, JS, images)
+│   ├── templates/                    # HTML templates for the web UI
+│   ├── app.py                        # Entry point for the web server
+│   ├── install_llama_cpp.sh          # Script to install llama-cpp-python and dependencies
+│   ├── requirements.txt              # Python dependencies for the project
+│   └── ...                           # Other backend modules and utilities
+├── notebooks/                        # Sample datasets and processed data
+    ├── run_first.sh                  # Installs all required Python libraries and dependencies
+│   ├── main_Music-mood Mirror.ipynb  # Main notebook for end-to-end lyric analysis
+│   ├── ground_truth.py               # Script to generate or collect ground truth data
+│   ├── verify_results.ipynb          # Compares analysis results from local LLMs with grount truth
+│   ├── RegisterLLM2MLflow.ipynb      # Registers Gemma-2B model with MLflow in AIStudio
+│   └── ...   
+├── data/                             # Sample datasets and processed data
+│   ├── sample/                       # Example listening history files for testing
+│   └── stats/                        # Analysis results and statistics (Excel, CSV)
+├── figures/                          # Screenshots and images for documentation
+├── analysis/                         # CSV files and result charts from model benchmarking
+├── FEEDBACKS.md                      # Detailed feedback on AI Studio
+└── README.md                         # Project documentation (this file)
+```
+
 
 # Instructions
 ## System Requirements
@@ -373,3 +409,27 @@ For benchmarking, we also used the o3-mini model via OpenAI's API to analyze 20 
 ![Positivity Score Comparison 1](analysis/comparison-positivity%20score_line_chart.png)
 ![Positivity Score Comparison 2](analysis/comparison-positivity%20score.png)
 ![Positivity Score Comparison 3](analysis/comparison-distribution%20of%20positivity%20score%20difference.png)
+
+# 🚀 What's next for GinkgoGreen
+
+- **Enhancing Personalization**  
+  We plan to introduce mood trend summaries and intelligent suggestions such as:  
+  > *“You've been listening to more melancholic ballads this week, which may suggest a lower mood. Want to try a calming playlist or talk to someone?”*  
+  This will help users reflect on their emotional patterns and take proactive steps when needed.
+
+- **Improving Model Accuracy and Efficiency**  
+  We'll continue refining our LLM pipeline through techniques like fine-tuning, smarter data sampling, and domain-specific adjustments to improve the quality and responsiveness of *Music Mood Mirror*.
+
+- **Growing as a Team**  
+  Looking ahead, we’re excited to deepen both our product thinking and technical capabilities. Our goal is to keep building meaningful, AI-powered tools that positively impact people’s lives—starting with music and mental wellness.
+
+
+# 🏆 Accomplishments that we're proud of
+One of the most meaningful accomplishments for us goes beyond the code itself. This project marks a full-circle moment in our friendship — we first teamed up for a college entrepreneur competition nearly 10 years ago but weren’t able to complete it due to coursework demands. Now, a decade later, we’ve grown into a data scientist/ML engineer and a software engineer, finally bringing a shared idea to life with *Music Mood Mirror*.
+
+We're proud of building an end-to-end prototype within a short timeframe, combining LLM-based emotional analysis, a functional backend pipeline, and a responsive web dashboard. This wasn’t just a technical win — it was a personal one, too.
+
+# 📚 What we learned
+Through this hackathon, we learned how powerful it can be to blend friendship, creativity, and technical skill into something with the potential to make a real impact. We deepened our experience with LLMs, learned how to process and visualize emotional data from lyrics, and sharpened our ability to iterate quickly across the full stack — from ideation to deployment.
+
+Most importantly, we were reminded that collaboration grounded in mutual respect and shared history can be a unique superpower. This project reinforced our belief in using technology with empathy — and we’re excited to keep building.
