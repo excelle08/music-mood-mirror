@@ -100,46 +100,25 @@ def mood_api():
 
     entries = ListenHistory.query.filter(
         ListenHistory.user_id == session['user_id'],
-        ListenHistory.play_datetime.isnot(None)
-    ).order_by(ListenHistory.play_datetime.asc()).all()
+        ListenHistory.week.isnot(None),
+        ListenHistory.positivity_score_local_wghted.isnot(None),
+        ListenHistory.repeats_this_week.isnot(None)
+    ).all()
 
-    if not entries:
-        return jsonify([])
+    week_map = defaultdict(list)
+    for e in entries:
+        y, w, _ = e.play_datetime.date().isocalendar()
+        week_map[(y, w)].append(e)
 
-    # Get first and last week
-    first_date = entries[0].play_datetime.date()
-    last_date = entries[-1].play_datetime.date()
-    start_year, start_week, _ = first_date.isocalendar()
-    end_year, end_week, _ = last_date.isocalendar()
-
-    # Create weekly range
     week_data = []
-    current = datetime.strptime(f"{start_year}-W{start_week}-1", "%G-W%V-%u").date()
-    end = datetime.strptime(f"{end_year}-W{end_week}-1", "%G-W%V-%u").date()
-
-    # Check for the weekly mood score file
-    weekly_mood_scores = {}
-    use_file = False
-    try:
-        with open('weekly_mood_scores.json', 'r') as f:
-            weekly_mood_scores = json.load(f)
-            use_file = True
-    except FileNotFoundError:
-        current_app.logger.warning("weekly_mood_scores.json not found, generating random scores.")
-        pass
-
-    while current <= end:
-        year, week, _ = current.isocalendar()
-        if use_file:
-            score = weekly_mood_scores.get(f"{year}-W{week}", 0)
-            score = round(score, 2)
-        else:
-            score = round(random.uniform(1, 5), 2)
-        week_data.append({
-            "label": f"{year}-W{week}",
-            "score": score
-        })
-        current += timedelta(days=7)
+    for (year, week), songs in sorted(week_map.items()):
+        total_weight = sum(e.repeats_this_week for e in songs)
+        if total_weight == 0:
+            continue
+        weighted_sum = sum(e.positivity_score_local_wghted for e in songs)
+        avg_score = round(weighted_sum / total_weight, 2)
+        label = f"{year}-W{week}"
+        week_data.append({"label": label, "score": avg_score})
 
     return jsonify(week_data)
 
@@ -148,6 +127,13 @@ def mood_api():
 def get_weekly_tags():
     year = int(request.args.get('year'))
     week = int(request.args.get('week'))
+
+    positivity_dict = {
+        'Joyful': 5, 'Melancholic': 2, 'Hopeful': 5, 'Angry': 1, 'Romantic': 4,
+        'Nostalgic': 3, 'Sad': 1, 'Energetic': 4, 'Passionate': 4, 'Lonely': 1,
+        'Uplifting': 5, 'Bittersweet': 3, 'Empowering': 5, 'Heartbroken': 1,
+        'Reflective': 3, 'Playful': 4, 'Dark': 1, 'Calm': 4, 'Longing': 2, 'Triumphant': 5
+    }
 
     entries = ListenHistory.query.filter(
         ListenHistory.user_id == session['user_id'],
@@ -162,6 +148,7 @@ def get_weekly_tags():
     for entry in entries:
         try:
             tags = json.loads(entry.mood_tags_local or '[]')
+            tags = [tag for tag in tags if tag in positivity_dict.keys()]
         except Exception as e:
             current_app.logger.error(f"Failed to parse mood_tags for entry {entry.id}, skipping: {e}")
             continue
