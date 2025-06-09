@@ -40,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       total.textContent = data.num_total;
       const percent = data.num_total ? Math.round((data.num_processed / data.num_total) * 100) : 0;
       bar.style.width = percent + "%";
-    }, 1000);
+    }, 10000);
   });
 
   modalEl.addEventListener("hidden.bs.modal", () => clearInterval(interval));
