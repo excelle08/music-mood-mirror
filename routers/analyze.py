@@ -8,7 +8,8 @@ from flask import Blueprint, request, session, jsonify, current_app
 from common.model import db, ListenHistory, RequestProgress
 from datetime import datetime, timedelta
 from collections import defaultdict
-from common import llm 
+from common import llm
+from config.settings import AI_INFERENCE_INTERVAL
 
 
 analyze_api = Blueprint('analyze_api', __name__)
@@ -81,7 +82,7 @@ def _run_analysis(app_context, request_id, user_id):
                 count += 1
             current.repeats_next_7d = count
             processed += 1
-        
+
         if time.time() - prev_time > 1 or k == len(by_song) - 1:
             current_app.logger.info(f"Processed {k + 1} / {len(by_song)} songs for next 7 days repeats...")
             progress.num_processed = processed
@@ -100,7 +101,7 @@ def _run_analysis(app_context, request_id, user_id):
                 entry.first_occurrence_in_week = False
 
             processed += len(week_entries)
-        
+
         if time.time() - prev_time > 1 or i == len(week_map) - 1:
             current_app.logger.info(f"Processed {i + 1} / {len(week_map)} weeks for first occurrence...")
             progress.num_processed = processed
@@ -115,10 +116,10 @@ def _run_analysis(app_context, request_id, user_id):
 def get_avg_positivity_score(tags: list) -> float:
     """
     Calculate the average positivity score based on the provided tags.
-    
+
     Args:
         tags (list): A list of tags representing emotions.
-        
+
     Returns:
         float: The average positivity score.
     """
@@ -130,7 +131,7 @@ def get_avg_positivity_score(tags: list) -> float:
     }
     scores = [positivity_dict.get(tag, 0) for tag in tags]
     valid_scores = [score for score in scores if score > 0]
-    
+
     if valid_scores:
         return sum(valid_scores) / len(valid_scores)
     else:
@@ -140,10 +141,10 @@ def get_avg_positivity_score(tags: list) -> float:
 def from_lyrics_to_positivity(lyrics: str) -> [list[str], float]:
     """
     Analyze the lyrics and return the average positivity score.
-    
+
     Args:
         lyrics (str): The lyrics to analyze.
-        
+
     Returns:
         float: The average positivity score of the lyrics.
     """
@@ -165,7 +166,7 @@ def from_lyrics_to_positivity(lyrics: str) -> [list[str], float]:
     mood = response['choices'][0]['text'].strip().split('\n')
     tags_str = mood[0] if mood else ''
     tags = [tag.lstrip('#') for tag in tags_str.strip().split()]
-    
+
     return tags, get_avg_positivity_score(tags)
 
 
@@ -193,23 +194,56 @@ def _run_emotion_analysis(app_context, request_id, user_id):
     app_context.push()
 
     try:
-        entries = ListenHistory.query.filter(
+        # Organize entries by (year, week)
+        from collections import defaultdict
+        week_map = defaultdict(list)
+        for e in ListenHistory.query.filter(
             ListenHistory.user_id == user_id,
             bool(ListenHistory.first_occurrence_in_week) is True,
             ListenHistory.lyrics.isnot(None),
-            ListenHistory.mood_tags_local.is_(None),
-            ListenHistory.positivity_score_local.is_(None)
-        ).all()
+            ListenHistory.play_datetime.isnot(None)
+        ).all():
+            y, w, _ = e.play_datetime.date().isocalendar()
+            week_map[(y, w)].append(e)
 
-        total = len(entries)
+        selected = []
+        for (y, w), week_entries in week_map.items():
+            with_mood = [e for e in week_entries if e.mood_tags_local and e.positivity_score_local]
+            if len(with_mood) >= 10:
+                continue
+            N = 10 - len(with_mood)
+            no_mood = [e for e in week_entries if not e.mood_tags_local and not e.positivity_score_local]
+
+            # Priority 1: high repeats_this_week ≥ 2
+            p1 = sorted([e for e in no_mood if (e.repeats_this_week or 0) >= 2],
+                        key=lambda x: x.repeats_this_week, reverse=True)
+
+            # Priority 2: specific reason_start
+            p2 = [e for e in no_mood if e.reason_start in ("clickrow", "backbtn", "playbtn")]
+
+            # Fill with remaining
+            p3 = [e for e in no_mood if e not in p1 and e not in p2]
+
+            added = []
+            for group in (p1, p2, p3):
+                for e in group:
+                    if len(added) >= N:
+                        break
+                    if e not in added:
+                        added.append(e)
+                if len(added) >= N:
+                    break
+
+            selected.extend(added)
+
+        total = len(selected)
         processed = 0
         success = 0
-
         progress = db.session.get(RequestProgress, request_id)
         progress.num_total = total
         db.session.commit()
 
-        for i, entry in enumerate(entries):
+        for i, entry in enumerate(selected):
             try:
                 mood_tags, score = from_lyrics_to_positivity(entry.lyrics)
                 entry.mood_tags_local = json.dumps(mood_tags)
@@ -217,16 +251,18 @@ def _run_emotion_analysis(app_context, request_id, user_id):
                 entry.positivity_score_local_wghted = score * (entry.repeats_this_week or 1)
                 db.session.add(entry)
                 success += 1
+                # Add sleep to prevent the machine crashing
+                time.sleep(AI_INFERENCE_INTERVAL)
             except Exception as e:
                 current_app.logger.error(f"Error processing entry {i}: {e}. \nDetailed traceback:")
                 current_app.logger.error(traceback.format_exc())
 
             processed += 1
-            if processed % 50 == 0 or i == total - 1:
-                progress = db.session.get(RequestProgress, request_id)
-                progress.num_processed = processed
-                progress.num_successful = success
-                db.session.commit()
+            # No need to report in batch because the inference step is slow
+            progress = db.session.get(RequestProgress, request_id)
+            progress.num_processed = processed
+            progress.num_successful = success
+            db.session.commit()
 
     except Exception as e:
         current_app.logger.error(f"Error during emotion analysis: {e}. \nDetailed traceback:")
