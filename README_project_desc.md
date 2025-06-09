@@ -71,7 +71,7 @@ This hackathon challenged us to move quickly while balancing thoughtful design w
 
 Most of all, we learned that strong collaboration, clear communication, and mutual respect are just as critical to successful product development as the technical tools we use.
 
-## 🚀 What's next for GinkgoGreen
+## 🚀 What's next for MusicMoodMirror, An LLM-powered Emotional Wellness Companion
 
 - **Enhancing Personalization**  
   We plan to introduce mood trend summaries and intelligent suggestions such as:  
