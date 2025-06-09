@@ -1,0 +1,18 @@
+
+{% extends "base.html" %}
+{% block content %}
+<h2>Top Weekly Repeats</h2>
+<canvas id="weeklyChart" height="100"></canvas>
+
+<hr>
+<h3>Music Completion Rate Distribution</h3>
+<canvas id="completionHistogram" height="100"></canvas>
+
+<hr>
+<h3>Seconds Played Distribution</h3>
+<canvas id="secondsHistogram" height="100"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ url_for('static', filename='js/weekly_chart.js') }}"></script>
+<script src="{{ url_for('static', filename='js/histograms.js') }}"></script>
+{% endblock %}

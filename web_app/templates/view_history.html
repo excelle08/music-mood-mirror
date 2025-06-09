@@ -1,0 +1,200 @@
+
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Your Listening History</h2>
+
+<form method="get" class="row row-cols-lg-auto g-3 align-items-center mb-3">
+  <div class="col-12">
+    <label class="form-check-label me-2">Filters:</label>
+    <div class="form-check form-switch d-inline-block">
+      <input class="form-check-input" type="checkbox" name="only_lyrics" value="1" id="onlyLyrics" {% if only_lyrics %}checked{% endif %}>
+      <label class="form-check-label" for="onlyLyrics">Only songs with lyrics</label>
+    </div>
+  </div>
+  <div class="col-12">
+    <label for="min_seconds" class="form-label">Min Seconds Played</label>
+    <input type="number" class="form-control" name="min_seconds" id="min_seconds" value="{{ min_seconds }}">
+  </div>
+  <div class="col-12">
+    <label for="min_completion" class="form-label">Min Completion Rate (%)</label>
+    <input type="number" class="form-control" name="min_completion" id="min_completion" value="{{ min_completion }}">
+  </div>
+  <div class="col-12">
+    <button type="submit" class="btn btn-primary">Apply</button>
+</div>
+</form>
+
+
+<!-- Lyrics Modal -->
+<div class="modal fade" id="lyricsModal" tabindex="-1" aria-labelledby="lyricsModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="lyricsModalLabel">Lyrics</h5>
+      </div>
+      <div class="modal-body">
+        <pre id="lyricsContent" class="mb-0 text-wrap text-break"></pre>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Analyze Progress Modal -->
+<div class="modal fade" id="analyzeModal" tabindex="-1" aria-labelledby="analyzeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="analyzeModalLabel">Analyzing History</h5>
+      </div>
+      <div class="modal-body">
+        <div class="progress mb-2">
+          <div id="analyze-progress-bar" class="progress-bar progress-bar-striped bg-info"
+               role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">
+          </div>
+        </div>
+        <p>Processed: <span id="analyze-processed">0</span> / <span id="analyze-total">?</span></p>
+      </div>
+      <div class="modal-footer d-none" id="analyze-close-wrapper">
+        <button type="button" class="btn btn-secondary" id="analyze-close-btn">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AI Emotion Analysis Modal -->
+<div class="modal fade" id="aiAnalyzeModal" tabindex="-1" aria-labelledby="aiAnalyzeModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiAnalyzeModalLabel">Analyzing Mood with AI</h5>
+      </div>
+      <div class="modal-body">
+        <div class="progress mb-2">
+          <div id="ai-progress-bar" class="progress-bar progress-bar-striped bg-warning"
+               role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100">
+          </div>
+        </div>
+        <p>Processed: <span id="ai-processed">0</span> / <span id="ai-total">?</span></p>
+      </div>
+      <div class="modal-footer d-none" id="ai-analyze-close-wrapper">
+        <a href="/analysis/mood" class="btn btn-success">Go to Mood Page</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='js/analyze_ai.js') }}"></script>
+
+<script>
+function showLyrics(lyrics) {
+  document.getElementById("lyricsContent").textContent = lyrics || "(No lyrics available)";
+  var modal = new bootstrap.Modal(document.getElementById("lyricsModal"));
+  modal.show();
+}
+</script>
+  <!--<button id="enrich-btn" class="btn btn-warning mb-3">Enrich Missing Lyrics</button>-->
+
+  <button id="analyze-btn" class="btn btn-outline-success">Analyze History</button>
+  <button id="ai-analyze-btn" class="btn btn-outline-danger">Analyze Mood with AI</button>
+  <!-- Modal -->
+  <div class="modal fade" id="progressModal" tabindex="-1" aria-labelledby="progressModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="progressModalLabel">Enriching Lyrics</h5>
+        </div>
+        <div class="modal-body">
+          <p>Processed: <span id="processed-count">0</span> / <span id="total-count">?</span></p>
+          <p>Successful: <span id="success-count">0</span></p>
+          <div class="progress mb-2">
+            <div id="progress-bar" class="progress-bar progress-bar-striped bg-success" role="progressbar" style="width: 0%;" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+        </div>
+        <div class="modal-footer" id="modal-close-btn-wrapper">
+          <button type="button" class="btn btn-secondary" id="modal-close-btn">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% if history %}
+    <table class="table table-bordered table-hover">
+      <thead class="table-light">
+        <tr>
+          <th>Title</th>
+          <th>Artist</th>
+          <th>Album</th>
+          <th>Played At</th>
+          <th>Song Duration</th>
+          <th>Seconds Played</th>
+          <th>Completion Rate</th>
+          <th>Start Reason</th>
+          <th>Lyrics</th>
+          <th>Week Num</th>
+          <th>First Played in Week?</th>
+          <th>Repeats This Week</th>
+          <th>Repeats Next 7 days</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in history %}
+        <tr>
+          <td>{{ entry.title }}</td>
+          <td>{{ entry.artist }}</td>
+          <td>{{ entry.album or '' }}</td>
+          <td>{{ entry.play_datetime or '' }}</td>
+          <td>{{ entry.duration or '' }}</td>
+          <td>{{ entry.seconds_played or '' }}</td>
+          <td>{{ '{:.0f}%'.format(entry.music_completion_rate) if entry.music_completion_rate else 'N/A' }}</td>
+          <td>{{ entry.reason_start or '' }}</td>
+          <td>
+            {% if entry.lyrics %}
+              <button class="btn btn-sm btn-outline-primary" onclick="showLyrics(`{{ entry.lyrics|e }}`)">View</button>
+            {% else %}
+              ❌
+            {% endif %}
+          </td>
+          <td>{{ entry.week or '' }}</td>
+          <td>{{ '✔️' if entry.first_occurrence_in_week else '' }}</td>
+          <td>{{ entry.repeats_this_week or '' }}</td>
+          <td>{{ entry.repeats_next_7d or '' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No listening history found.</p>
+  {% endif %}
+
+  <div class="d-flex justify-content-between align-items-center mt-3">
+    <form method="get" class="d-flex align-items-center">
+      <input type="hidden" name="page" value="{{ page }}">
+      <label for="per_page" class="me-2">Entries per page:</label>
+      <select id="per_page" name="per_page" class="form-select w-auto" onchange="this.form.submit()">
+        <option value="20" {% if per_page == 20 %}selected{% endif %}>20</option>
+        <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+        <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+      </select>
+    </form>
+
+    <nav>
+      <ul class="pagination mb-0">
+        <li class="page-item {% if not pagination.has_prev %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('history.view_history', page=pagination.prev_num, per_page=per_page) }}">Previous</a>
+        </li>
+        <li class="page-item disabled"><span class="page-link">Page {{ page }}</span></li>
+        <li class="page-item {% if not pagination.has_next %}disabled{% endif %}">
+          <a class="page-link" href="{{ url_for('history.view_history', page=pagination.next_num, per_page=per_page) }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/analyze.js') }}"></script>
+<script src="{{ url_for('static', filename='js/enrich.js') }}"></script>
+{% endblock %}

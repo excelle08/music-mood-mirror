@@ -2,4 +2,14 @@ archive/*
 README_project_desc.md
 .DS_Store
 docs_internal/*
-
+data_YTB/*
+venv
+*.log
+.*.swp
+__pycache__
+data/*.json
+data/yearly
+data/*.db
+data/*.zip
+instance/
+mlruns/
