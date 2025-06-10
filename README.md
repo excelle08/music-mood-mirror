@@ -88,7 +88,7 @@ music-mood-mirror/
 │   ├── requirements.txt              # Python dependencies for the project
 │   └── ...                           # Other backend modules and utilities
 ├── notebooks/                        # Sample datasets and processed data
-    ├── run_first.sh                  # Installs all required Python libraries and dependencies
+│   ├── run_first.sh                  # Installs all required Python libraries and dependencies
 │   ├── main_Music-mood Mirror.ipynb  # Main notebook for end-to-end lyric analysis
 │   ├── ground_truth.py               # Script to generate or collect ground truth data
 │   ├── verify_results.ipynb          # Compares analysis results from local LLMs with grount truth
