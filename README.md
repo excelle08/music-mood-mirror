@@ -40,7 +40,7 @@
 - [What we learned](#-what-we-learned)
 
 # Project Description
-## 🎵 Music Mood Mirror – An LLM-powered Emotional Wellness Companion by *GinkoGreenAI*
+## 🎵 Music Mood Mirror – An LLM-powered Emotional Wellness Companion by *GinkgoGreenAI*
 
 ## 🧠 Inspiration  
 Music often reflects our emotional state—sometimes more honestly than we can express ourselves. While many people intuitively recognize this connection, those navigating mental health challenges like depression, anxiety, or bipolar disorder may struggle with emotional awareness.  
